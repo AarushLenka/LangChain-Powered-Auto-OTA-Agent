@@ -3,11 +3,11 @@ import json
 import uuid
 from datetime import datetime
 from flask import Flask, request, jsonify
-import sys  # <-- Import for sys.exit()
-from dotenv import load_dotenv  # <-- Import for .env file
+import sys
+from dotenv import load_dotenv
 
 # Load environment variables from .env file
-load_dotenv()  # <-- Load .env file
+load_dotenv()
 
 # LangChain imports
 from langchain.agents import AgentExecutor, create_react_agent
@@ -20,7 +20,7 @@ from langchain_openai import ChatOpenAI
 # If not set, the script will exit.
 if "OPENAI_API_KEY" not in os.environ:
     print("Error: OPENAI_API_KEY environment variable not set.")
-    sys.exit(1)  # <-- Correct way to exit
+    sys.exit(1)
 
 DB_FILE = "db.json"
 FIRMWARE_DIR = "firmware"
@@ -54,8 +54,9 @@ def update_device_firmware_path(device_id, new_path):
 
 # --- LANGCHAIN CUSTOM TOOLS ---
 class ReadFirmwareTool(BaseTool):
-    name = "read_current_firmware"
-    description = "Reads the current firmware code for a given device ID. Input must be the device_id as a string."
+    # --- FIX: Added : str type annotations ---
+    name: str = "read_current_firmware"
+    description: str = "Reads the current firmware code for a given device ID. Input must be the device_id as a string."
 
     def _run(self, device_id: str) -> str:
         """Reads and returns the content of the current firmware file."""
@@ -73,8 +74,9 @@ class ReadFirmwareTool(BaseTool):
             return f"Error: Firmware file not found at path: {firmware_path}"
 
 class WriteFirmwareTool(BaseTool):
-    name = "write_new_firmware"
-    description = "Writes new firmware code to a file for a specific device. Input must be a dictionary with 'device_id' and 'new_code'."
+    # --- FIX: Added : str type annotations ---
+    name: str = "write_new_firmware"
+    description: str = "Writes new firmware code to a file for a specific device. Input must be a dictionary with 'device_id' and 'new_code'."
 
     def _run(self, device_id: str, new_code: str) -> str:
         """Saves the new firmware and updates the database."""
@@ -96,8 +98,9 @@ class WriteFirmwareTool(BaseTool):
             return f"Error writing firmware: {e}"
 
 class DeviceStateTool(BaseTool):
-    name = "get_device_state"
-    description = "Retrieves the sensor schema and current configuration for a device. Input must be the device_id as a string."
+    # --- FIX: Added : str type annotations ---
+    name: str = "get_device_state"
+    description: str = "Retrieves the sensor schema and current configuration for a device. Input must be the device_id as a string."
 
     def _run(self, device_id: str) -> str:
         """Returns the device state as a JSON string."""
@@ -108,8 +111,9 @@ class DeviceStateTool(BaseTool):
         return f"Error: No state found for device_id '{device_id}'."
 
 class TriggerOtaFlashTool(BaseTool):
-    name = "trigger_ota_flash"
-    description = "Simulates triggering an Over-The-Air flash process for the device. The device will then pull the latest firmware. Input must be the device_id as a string."
+    # --- FIX: Added : str type annotations ---
+    name: str = "trigger_ota_flash"
+    description: str = "Simulates triggering an Over-The-Air flash process for the device. The device will then pull the latest firmware. Input must be the device_id as a string."
 
     def _run(self, device_id: str) -> str:
         """Simulates the OTA flash command."""
@@ -124,20 +128,27 @@ class TriggerOtaFlashTool(BaseTool):
 # --- AGENT SETUP ---
 # Define the prompt template
 prompt_template = """
-You are an expert autonomous IoT firmware engineer. Your task is to modify device firmware based on real-time events and predefined policies.
-You have received a runtime event from device: '{device_id}'
-The event is: '{event_details}'
-The user-defined policy for this event is: '{policy}'
+You are an expert autonomous IoT firmware engineer.
+You have access to the following tools:
+{tools}
 
-Your goal is to rewrite the device's firmware to implement the logic defined in the policy.
-Follow these steps precisely:
-1. **Analyze Context**: Use the 'get_device_state' tool to understand the device's capabilities (like its sensor schema).
-2. **Read Current Code**: Use the 'read_current_firmware' tool to get the current source code.
-3. **Synthesize New Code**: Based on the event, policy, and current code, rewrite the *entire* firmware. The new code must be a complete, compilable C++/Arduino program. Do not write partial code or snippets. The new logic should be robust.
-4. **Save New Firmware**: Use the 'write_new_firmware' tool, passing the 'device_id' and the 'new_code' you just generated.
-5. **Deploy**: Use the 'trigger_ota_flash' tool to simulate deploying the update to the device.
+Use the following format:
 
-Begin the process now.
+Thought: you should always think about what to do
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: a summary of the actions taken and the final result.
+
+Begin!
+
+Your task is to process the following event:
+{input}
+
+Follow the steps outlined in the task *exactly*.
+Thought:{agent_scratchpad}
 """
 
 def create_agent():
@@ -197,9 +208,12 @@ if __name__ == '__main__':
         os.makedirs(os.path.join(FIRMWARE_DIR, "device-001"))
 
     # Create dummy initial firmware if it doesn't exist
-    initial_firmware_path = os.path.join(FIRMWARE_DIR, "device-001", "v1.0.cpp")
+    initial_firmware_path = os.path.join(FIRMWARE_DIR, "device-001", "v1.0..cpp") # Note: potential typo in original doc, should be v1.0.cpp
     if not os.path.exists(initial_firmware_path):
-        initial_code = """// Firmware Version: 1.0
+        # Correcting path if the typo-version wasn't found
+        initial_firmware_path_corrected = os.path.join(FIRMWARE_DIR, "device-001", "v1.0.cpp")
+        if not os.path.exists(initial_firmware_path_corrected):
+            initial_code = """// Firmware Version: 1.0
 // Active Sensors: A, C, D
 #include <Arduino.h>
 void setup() { Serial.begin(115200); Serial.println("Device starting... Firmware v1.0"); }
@@ -209,8 +223,8 @@ void loop() {
     if (sensor_a_value > 100) { Serial.println("EVENT: sensor_A_threshold_exceeded"); }
     delay(5000);
 }"""
-        with open(initial_firmware_path, 'w') as f:
-            f.write(initial_code)
+            with open(initial_firmware_path_corrected, 'w') as f:
+                f.write(initial_code)
 
     # Run the Flask app
     app.run(port=5001, debug=True)
