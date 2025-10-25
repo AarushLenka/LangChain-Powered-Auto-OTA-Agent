@@ -1,0 +1,117 @@
+# ##################################################################
+# A .gitignore file for Python, C++, and JSON
+#
+# Sections:
+# 1. Operating System & Editor specific
+# 2. General Build & Dependency Artifacts
+# 3. Secrets & Sensitive Data (CRITICAL!)
+# 4. Python
+# 5. C++
+# 6. JSON (Special notes)
+# ##################################################################
+
+# 1. Operating System & Editor specific
+# ========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+
+# IDE & Text Editors
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.vs/
+*.swp
+*.swo
+
+# 2. General Build & Dependency Artifacts
+# ========================================
+build/
+dist/
+*.log
+
+# 3. Secrets & Sensitive Data (CRITICAL!)
+# ========================================
+# NEVER commit secret keys, passwords, or credentials!
+.env
+*.key
+*.pem
+*.secret
+# Add any specific secret files by name below
+# secrets.json
+# *credentials.json
+
+# 4. Python
+# ========================================
+# Bytecode
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Packaging & Distribution
+*.egg-info/
+*.egg
+*.whl
+
+# Testing & Coverage
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# 5. C++
+# ========================================
+# Compiled object files
+*.o
+*.obj
+*.obj.*
+
+# Precompiled headers
+*.pch
+
+# Shared libraries and executables
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+a.out
+
+# Build directories
+cmake-build-*/
+.cxx/
+Debug/
+Release/
+
+# 6. JSON
+# ========================================
+# NOTE: You should NOT ignore all .json files (e.g., *.json)
+# Many .json files are configuration (like package.json) and SHOULD be committed.
+#
+# Instead, add specific JSON files that contain
+# sensitive data to the "Secrets" section (Section 3) above.
+#
+# Example (uncomment if you use these):
+# secrets.json
+# config.local.json
+# *credentials.json

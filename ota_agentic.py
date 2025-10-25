@@ -9,14 +9,27 @@ from langchain.agents import AgentExecutor, create_react_agent
 from langchain.prompts import PromptTemplate
 from langchain_core.tools import BaseTool
 from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv  # <-- 1. ADD THIS IMPORT
+
+# Load environment variables from .env file
+load_dotenv()
 
 # --- CONFIGURATION ---
 # IMPORTANT: Set your OpenAI API key in your environment variables
 # export OPENAI_API_KEY="your_key_here"
 # If not set, the script will exit.
-if "OPENAI_API_KEY" not in os.environ:
-    print("Error: OPENAI_API_KEY environment variable not set.")
+# if "OPENAI_API_KEY" not in os.environ:
+#     print("Error: OPENAI_API_KEY environment variable not set.")
+#     exit()
+
+# --- CONFIGURATION ---
+# IMPORTANT: Set your OpenAI API key in your environment variables
+# ...
+[cite_start]if "OPENAI_API_KEY" not in os.environ: [cite: 153]
+    [cite_start]print("Error: OPENAI_API_KEY environment variable not set.") [cite: 154]
     exit()
+
+
 
 DB_FILE = "db.json"
 FIRMWARE_DIR = "firmware"
