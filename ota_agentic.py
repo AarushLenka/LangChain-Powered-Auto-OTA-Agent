@@ -3,40 +3,31 @@ import json
 import uuid
 from datetime import datetime
 from flask import Flask, request, jsonify
+import sys  # <-- Import for sys.exit()
+from dotenv import load_dotenv  # <-- Import for .env file
+
+# Load environment variables from .env file
+load_dotenv()  # <-- Load .env file
 
 # LangChain imports
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain.prompts import PromptTemplate
 from langchain_core.tools import BaseTool
 from langchain_openai import ChatOpenAI
-from dotenv import load_dotenv  # <-- 1. ADD THIS IMPORT
-
-# Load environment variables from .env file
-load_dotenv()
 
 # --- CONFIGURATION ---
 # IMPORTANT: Set your OpenAI API key in your environment variables
-# export OPENAI_API_KEY="your_key_here"
 # If not set, the script will exit.
-# if "OPENAI_API_KEY" not in os.environ:
-#     print("Error: OPENAI_API_KEY environment variable not set.")
-#     exit()
-
-# --- CONFIGURATION ---
-# IMPORTANT: Set your OpenAI API key in your environment variables
-# ...
-[cite_start]if "OPENAI_API_KEY" not in os.environ: [cite: 153]
-    [cite_start]print("Error: OPENAI_API_KEY environment variable not set.") [cite: 154]
-    exit()
-
-
+if "OPENAI_API_KEY" not in os.environ:
+    print("Error: OPENAI_API_KEY environment variable not set.")
+    sys.exit(1)  # <-- Correct way to exit
 
 DB_FILE = "db.json"
 FIRMWARE_DIR = "firmware"
 
 # --- DATABASE HELPERS ---
 def get_device_state(device_id):
-    """Reads the state of a device from the DB.""" [cite: 158-159]
+    """Reads the state of a device from the DB."""
     try:
         with open(DB_FILE, 'r') as f:
             data = json.load(f)
@@ -45,7 +36,7 @@ def get_device_state(device_id):
         return None
 
 def update_device_firmware_path(device_id, new_path):
-    """Updates the firmware path for a device in the DB.""" [cite: 164-165]
+    """Updates the firmware path for a device in the DB."""
     try:
         with open(DB_FILE, 'r') as f:
             data = json.load(f)
@@ -64,14 +55,14 @@ def update_device_firmware_path(device_id, new_path):
 # --- LANGCHAIN CUSTOM TOOLS ---
 class ReadFirmwareTool(BaseTool):
     name = "read_current_firmware"
-    description = "Reads the current firmware code for a given device ID. Input must be the device_id as a string." [cite: 177-180]
+    description = "Reads the current firmware code for a given device ID. Input must be the device_id as a string."
 
     def _run(self, device_id: str) -> str:
-        """Reads and returns the content of the current firmware file.""" [cite: 181-182]
+        """Reads and returns the content of the current firmware file."""
         print(f"\nTOOL: Reading firmware for device '{device_id}'...")
         state = get_device_state(device_id)
         if not state or 'current_firmware_path' not in state:
-            return f"Error: No state or firmware path found for device_id '{device_id}'." [cite: 185-186]
+            return f"Error: No state or firmware path found for device_id '{device_id}'."
         firmware_path = state['current_firmware_path']
         try:
             with open(firmware_path, 'r') as f:
@@ -79,14 +70,14 @@ class ReadFirmwareTool(BaseTool):
             print(f"TOOL: Successfully read {firmware_path}")
             return content
         except FileNotFoundError:
-            return f"Error: Firmware file not found at path: {firmware_path}" [cite: 192-193]
+            return f"Error: Firmware file not found at path: {firmware_path}"
 
 class WriteFirmwareTool(BaseTool):
     name = "write_new_firmware"
-    description = "Writes new firmware code to a file for a specific device. Input must be a dictionary with 'device_id' and 'new_code'." [cite: 194-197]
+    description = "Writes new firmware code to a file for a specific device. Input must be a dictionary with 'device_id' and 'new_code'."
 
     def _run(self, device_id: str, new_code: str) -> str:
-        """Saves the new firmware and updates the database.""" [cite: 198-199]
+        """Saves the new firmware and updates the database."""
         print(f"\nTOOL: Writing new firmware for device '{device_id}'...")
         # Create a new versioned file path
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -100,33 +91,33 @@ class WriteFirmwareTool(BaseTool):
             # Update the database to point to the new firmware
             update_device_firmware_path(device_id, new_firmware_path)
             print(f"TOOL: New firmware saved to {new_firmware_path} and DB updated.")
-            return f"Successfully wrote new firmware version {new_version_str} for device {device_id}." [cite: 210-211]
+            return f"Successfully wrote new firmware version {new_version_str} for device {device_id}."
         except Exception as e:
-            return f"Error writing firmware: {e}" [cite: 212-213]
+            return f"Error writing firmware: {e}"
 
 class DeviceStateTool(BaseTool):
     name = "get_device_state"
-    description = "Retrieves the sensor schema and current configuration for a device. Input must be the device_id as a string." [cite: 214-217]
+    description = "Retrieves the sensor schema and current configuration for a device. Input must be the device_id as a string."
 
     def _run(self, device_id: str) -> str:
-        """Returns the device state as a JSON string.""" [cite: 218-219]
+        """Returns the device state as a JSON string."""
         print(f"\nTOOL: Getting state for device '{device_id}'...")
         state = get_device_state(device_id)
         if state:
             return json.dumps(state)
-        return f"Error: No state found for device_id '{device_id}'." [cite: 224]
+        return f"Error: No state found for device_id '{device_id}'."
 
 class TriggerOtaFlashTool(BaseTool):
     name = "trigger_ota_flash"
-    description = "Simulates triggering an Over-The-Air flash process for the device. The device will then pull the latest firmware. Input must be the device_id as a string." [cite: 225-227]
+    description = "Simulates triggering an Over-The-Air flash process for the device. The device will then pull the latest firmware. Input must be the device_id as a string."
 
     def _run(self, device_id: str) -> str:
-        """Simulates the OTA flash command.""" [cite: 228-229]
+        """Simulates the OTA flash command."""
         print(f"\nTOOL: Triggering OTA flash for device '{device_id}'...")
         state = get_device_state(device_id)
         latest_firmware = state.get('current_firmware_path', 'N/A')
         # In a real system, this would call a real OTA service API
-        log_message = f"OTA flash command sent to device '{device_id}'. Device will now update to firmware: '{latest_firmware}'." [cite: 234-235]
+        log_message = f"OTA flash command sent to device '{device_id}'. Device will now update to firmware: '{latest_firmware}'."
         print(f"TOOL: {log_message}")
         return log_message
 
@@ -150,7 +141,7 @@ Begin the process now.
 """
 
 def create_agent():
-    """Initializes and returns the LangChain agent.""" [cite: 256, 258]
+    """Initializes and returns the LangChain agent."""
     # Initialize LLM
     llm = ChatOpenAI(model="gpt-4-turbo-preview", temperature=0.2)
     # Initialize tools
@@ -174,7 +165,7 @@ agent_executor = create_agent()
 
 @app.route('/trigger-agent', methods=['POST'])
 def handle_event():
-    """Endpoint to receive events and trigger the agent.""" [cite: 278, 280]
+    """Endpoint to receive events and trigger the agent."""
     data = request.json
     device_id = data.get("device_id")
     event_details = data.get("event_details")
