@@ -8,8 +8,8 @@ class Config:
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     DB_FILE = "db.json"
     FIRMWARE_DIR = "firmware"
-    FLASK_PORT = 5001
-    FLASK_DEBUG = True
+    SERVER_PORT = 5001
+    DEBUG = True
     LLM_MODEL = "gpt-4o-mini"
     LLM_TEMPERATURE = 0.2
     

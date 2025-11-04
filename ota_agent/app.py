@@ -1,48 +1,54 @@
-from flask import Flask, request, jsonify
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 import traceback
 from .agent import FirmwareAgent
 
 
-def create_app(agent: FirmwareAgent) -> Flask:
-    """Factory function to create and configure Flask app."""
-    app = Flask(__name__)
+class EventRequest(BaseModel):
+    device_id: str
+    event_details: str
+    policy: str
+
+
+class HealthResponse(BaseModel):
+    status: str
+
+
+class EventResponse(BaseModel):
+    success: bool
+    agent_output: str
+
+
+def create_app(agent: FirmwareAgent) -> FastAPI:
+    """Factory function to create and configure FastAPI app."""
+    app = FastAPI(title="OTA Agent", description="Autonomous IoT Firmware Management System")
     
-    @app.route('/health', methods=['GET'])
-    def health_check():
+    @app.get("/health", response_model=HealthResponse)
+    async def health_check():
         """Health check endpoint."""
-        return jsonify({"status": "healthy"}), 200
+        return HealthResponse(status="healthy")
     
-    @app.route('/trigger-agent', methods=['POST'])
-    def handle_event():
+    @app.post("/trigger-agent", response_model=EventResponse)
+    async def handle_event(request: EventRequest):
         """Handle incoming device events and trigger agent."""
-        data = request.json
-        device_id = data.get("device_id")
-        event_details = data.get("event_details")
-        policy = data.get("policy")
-
-        if not all([device_id, event_details, policy]):
-            return jsonify({
-                "error": "Missing required fields: device_id, event_details, or policy"
-            }), 400
-
-        print(f"\n\n--- New Event for {device_id} ---")
-        print(f"Event: {event_details}")
-        print(f"Policy: {policy}")
+        print(f"\n\n--- New Event for {request.device_id} ---")
+        print(f"Event: {request.event_details}")
+        print(f"Policy: {request.policy}")
         print("--- Invoking Agent ---")
 
         input_string = FirmwareAgent.create_agent_prompt(
-            device_id, event_details, policy
+            request.device_id, request.event_details, request.policy
         )
 
         try:
             result = agent.invoke({"input": input_string})
-            return jsonify({
-                "success": True,
-                "agent_output": result.get('output')
-            })
+            return EventResponse(
+                success=True,
+                agent_output=result.get('output', '')
+            )
         except Exception as e:
             print(f"Error: {e}")
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            raise HTTPException(status_code=500, detail=str(e))
     
     return app

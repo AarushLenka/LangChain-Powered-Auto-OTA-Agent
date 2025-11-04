@@ -15,7 +15,14 @@ class DeviceDatabase:
             with open(self.db_file, 'r') as f:
                 data = json.load(f)
             return data.get(device_id)
-        except (FileNotFoundError, json.JSONDecodeError):
+        except FileNotFoundError:
+            print(f"Database file {self.db_file} not found")
+            return None
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON from {self.db_file}: {e}")
+            return None
+        except Exception as e:
+            print(f"Unexpected error reading device state: {e}")
             return None
     
     def update_firmware_path(self, device_id: str, new_path: str) -> bool:
@@ -33,9 +40,18 @@ class DeviceDatabase:
                 with open(self.db_file, 'w') as f:
                     json.dump(data, f, indent=2)
                 return True
-        except (FileNotFoundError, json.JSONDecodeError):
-            pass
-        return False
+            else:
+                print(f"Device {device_id} not found in database")
+                return False
+        except FileNotFoundError:
+            print(f"Database file {self.db_file} not found")
+            return False
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON from {self.db_file}: {e}")
+            return False
+        except Exception as e:
+            print(f"Unexpected error updating firmware path: {e}")
+            return False
     
     def initialize_device(self, device_id: str, initial_firmware_path: str):
         """Initialize a device in the database if it doesn't exist."""
@@ -48,12 +64,14 @@ class DeviceDatabase:
             
             if device_id not in data:
                 data[device_id] = {
-                    "device_id": device_id,
                     "current_firmware_path": initial_firmware_path,
-                    "sensors": {
-                        "A": {"pin": 1, "type": "analog"},
-                        "C": {"pin": 3, "type": "analog"},
-                        "D": {"pin": 4, "type": "digital"}
+                    "sensor_schema": {
+                        "A": {"type": "temperature", "pin": 1, "unit": "celsius"},
+                        "B": {"type": "humidity", "pin": 2, "unit": "percentage"},
+                        "C": {"type": "pressure", "pin": 3, "unit": "pascal"},
+                        "D": {"type": "light_intensity", "pin": 4, "unit": "lux"},
+                        "E": {"type": "motion", "pin": 5, "unit": "boolean"},
+                        "F": {"type": "gps_latitude", "pin": 6, "unit": "degrees"}
                     },
                     "version_history": [initial_firmware_path]
                 }
