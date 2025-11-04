@@ -1,40 +1,41 @@
 {
-    "device-001": {
-    "current_firmware_path": "firmware/device-001/v1.0.cpp",
+  "device-001": {
+    "current_firmware_path": "firmware/device-001/v20251104221103.cpp",
     "sensor_schema": {
-        "A": {
-            "type": "temperature",
-            "pin": 1,
-            "unit": "celsius"
-        },
-        "B": {
-            "type": "humidity",
-            "pin": 2,
-            "unit": "percentage"
-        },
-        "C": {
-            "type": "pressure",
-            "pin": 3,
-            "unit": "pascal"
-        },
-        "D": {
-            "type": "light_intensity",
-            "pin": 4,
-            "unit": "lux"
-        },
-        "E": {
-            "type": "motion",
-            "pin": 5,
-            "unit": "boolean"
-        },
-        "F": {
-            "type": "gps_latitude",
-            "pin": 6,
-            "unit": "degrees"
-        }
-        },
-        "version_history": [
-        "firmware/device-001/v1.0.cpp"
-        ]
-    }
-    }
+      "A": {
+        "type": "temperature",
+        "pin": 1,
+        "unit": "celsius"
+      },
+      "B": {
+        "type": "humidity",
+        "pin": 2,
+        "unit": "percentage"
+      },
+      "C": {
+        "type": "pressure",
+        "pin": 3,
+        "unit": "pascal"
+      },
+      "D": {
+        "type": "light_intensity",
+        "pin": 4,
+        "unit": "lux"
+      },
+      "E": {
+        "type": "motion",
+        "pin": 5,
+        "unit": "boolean"
+      },
+      "F": {
+        "type": "gps_latitude",
+        "pin": 6,
+        "unit": "degrees"
+      }
+    },
+    "version_history": [
+      "firmware/device-001/v1.0.cpp",
+      "firmware/device-001/v20251104221103.cpp"
+    ]
+  }
+}
