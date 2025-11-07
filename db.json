@@ -1,6 +1,6 @@
 {
   "device-001": {
-    "current_firmware_path": "firmware/device-001/v20251106222022.cpp",
+    "current_firmware_path": "firmware/device-001/v20251106234228.cpp",
     "sensor_schema": {
       "A": {
         "type": "temperature",
@@ -36,7 +36,8 @@
     "version_history": [
       "firmware/device-001/v1.0.cpp",
       "firmware/device-001/v20251104221103.cpp",
-      "firmware/device-001/v20251106222022.cpp"
+      "firmware/device-001/v20251106222022.cpp",
+      "firmware/device-001/v20251106234228.cpp"
     ]
   }
 }

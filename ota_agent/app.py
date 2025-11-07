@@ -7,7 +7,7 @@ from .agent import FirmwareAgent
 class EventRequest(BaseModel):
     device_id: str
     event_details: str
-    policy: str
+    policy: str = None  # Optional - for backward compatibility
 
 
 class HealthResponse(BaseModel):
@@ -33,7 +33,10 @@ def create_app(agent: FirmwareAgent) -> FastAPI:
         """Handle incoming device events and trigger agent."""
         print(f"\n\n--- New Event for {request.device_id} ---")
         print(f"Event: {request.event_details}")
-        print(f"Policy: {request.policy}")
+        if request.policy:
+            print(f"Policy: {request.policy}")
+        else:
+            print("Mode: Autonomous Decision Making")
         print("--- Invoking Agent ---")
 
         input_string = FirmwareAgent.create_agent_prompt(
