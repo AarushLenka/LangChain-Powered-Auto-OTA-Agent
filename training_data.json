@@ -1,0 +1,921 @@
+{
+  "metadata": {
+    "description": "Comprehensive training dataset for autonomous IoT firmware agent",
+    "total_scenarios": 100,
+    "categories": [
+      "temperature_management",
+      "power_management",
+      "sensor_diagnostics",
+      "network_connectivity",
+      "security_events",
+      "environmental_adaptation",
+      "performance_optimization",
+      "predictive_maintenance",
+      "multi_sensor_coordination",
+      "emergency_protocols"
+    ],
+    "version": "1.0"
+  },
+  "training_scenarios": [
+    {
+      "id": 1,
+      "category": "temperature_management",
+      "device_id": "device-001",
+      "event_details": "sensor_A_temperature_85_celsius_sustained_for_10_minutes",
+      "severity": "high",
+      "expected_actions": ["activate_cooling", "reduce_cpu_frequency", "increase_monitoring_rate"],
+      "context": "Industrial monitoring in summer conditions"
+    },
+    {
+      "id": 2,
+      "category": "temperature_management",
+      "device_id": "device-001",
+      "event_details": "sensor_A_temperature_95_celsius_critical_shutdown_imminent",
+      "severity": "critical",
+      "expected_actions": ["emergency_shutdown", "alert_system", "save_critical_data"],
+      "context": "Equipment overheating emergency"
+    },
+    {
+      "id": 3,
+      "category": "temperature_management",
+      "device_id": "device-001",
+      "event_details": "sensor_A_temperature_fluctuating_rapidly_between_20_and_80_celsius",
+      "severity": "medium",
+      "expected_actions": ["stabilize_readings", "increase_sampling_rate", "check_sensor_integrity"],
+      "context": "Unstable thermal environment"
+    },
+    {
+      "id": 4,
+      "category": "temperature_management",
+      "device_id": "device-001",
+      "event_details": "sensor_A_temperature_below_freezing_minus_5_celsius",
+      "severity": "medium",
+      "expected_actions": ["cold_weather_mode", "battery_protection", "reduce_operations"],
+      "context": "Winter outdoor deployment"
+    },
+    {
+      "id": 5,
+      "category": "temperature_management",
+      "device_id": "device-001",
+      "event_details": "temperature_gradient_detected_sensor_A_80C_sensor_C_25C_thermal_imbalance",
+      "severity": "medium",
+      "expected_actions": ["investigate_hotspot", "redistribute_load", "thermal_mapping"],
+      "context": "Uneven heat distribution"
+    },
+    {
+      "id": 6,
+      "category": "power_management",
+      "device_id": "device-001",
+      "event_details": "battery_voltage_3.2V_20_percent_remaining_power_conservation_required",
+      "severity": "high",
+      "expected_actions": ["disable_non_essential_sensors", "reduce_transmission_frequency", "enter_power_save_mode"],
+      "context": "Low battery situation"
+    },
+    {
+      "id": 7,
+      "category": "power_management",
+      "device_id": "device-001",
+      "event_details": "battery_voltage_2.9V_critical_5_percent_shutdown_in_30_minutes",
+      "severity": "critical",
+      "expected_actions": ["emergency_data_backup", "minimal_operation_mode", "shutdown_preparation"],
+      "context": "Battery critically low"
+    },
+    {
+      "id": 8,
+      "category": "power_management",
+      "device_id": "device-001",
+      "event_details": "solar_panel_optimal_charging_4.8V_excess_power_available",
+      "severity": "low",
+      "expected_actions": ["enable_all_sensors", "increase_sampling_rate", "perform_maintenance_tasks"],
+      "context": "Abundant solar power"
+    },
+    {
+      "id": 9,
+      "category": "power_management",
+      "device_id": "device-001",
+      "event_details": "power_consumption_increased_40_percent_unexpected_drain_detected",
+      "severity": "medium",
+      "expected_actions": ["identify_power_drain", "optimize_operations", "check_for_malfunction"],
+      "context": "Abnormal power usage"
+    },
+    {
+      "id": 10,
+      "category": "power_management",
+      "device_id": "device-001",
+      "event_details": "battery_degradation_detected_capacity_reduced_to_60_percent_of_original",
+      "severity": "medium",
+      "expected_actions": ["adjust_power_profile", "reduce_baseline_consumption", "schedule_replacement"],
+      "context": "Aging battery"
+    },
+    {
+      "id": 11,
+      "category": "sensor_diagnostics",
+      "device_id": "device-001",
+      "event_details": "sensor_B_humidity_returning_impossible_values_150_percent",
+      "severity": "high",
+      "expected_actions": ["disable_faulty_sensor", "switch_to_backup", "log_malfunction"],
+      "context": "Sensor hardware failure"
+    },
+    {
+      "id": 12,
+      "category": "sensor_diagnostics",
+      "device_id": "device-001",
+      "event_details": "sensor_A_readings_drifting_5_degrees_higher_than_reference_calibration_needed",
+      "severity": "medium",
+      "expected_actions": ["recalibrate_sensor", "apply_correction_factor", "validate_against_other_sensors"],
+      "context": "Sensor drift over time"
+    },
+    {
+      "id": 13,
+      "category": "sensor_diagnostics",
+      "device_id": "device-001",
+      "event_details": "sensor_C_pressure_no_response_flatline_at_0_pascal",
+      "severity": "high",
+      "expected_actions": ["mark_sensor_failed", "use_alternative_data_source", "alert_maintenance"],
+      "context": "Complete sensor failure"
+    },
+    {
+      "id": 14,
+      "category": "sensor_diagnostics",
+      "device_id": "device-001",
+      "event_details": "sensor_D_light_intensity_noisy_readings_high_variance_detected",
+      "severity": "low",
+      "expected_actions": ["apply_smoothing_filter", "increase_averaging_window", "check_electrical_interference"],
+      "context": "Noisy sensor data"
+    },
+    {
+      "id": 15,
+      "category": "sensor_diagnostics",
+      "device_id": "device-001",
+      "event_details": "all_sensors_showing_synchronized_anomalies_possible_power_issue",
+      "severity": "high",
+      "expected_actions": ["check_power_supply", "reset_sensor_array", "diagnostic_mode"],
+      "context": "System-wide sensor issue"
+    },
+    {
+      "id": 16,
+      "category": "network_connectivity",
+      "device_id": "device-001",
+      "event_details": "wifi_connection_lost_attempting_reconnection_failed_5_times",
+      "severity": "medium",
+      "expected_actions": ["switch_to_local_storage", "retry_with_backoff", "try_alternative_network"],
+      "context": "Network connectivity loss"
+    },
+    {
+      "id": 17,
+      "category": "network_connectivity",
+      "device_id": "device-001",
+      "event_details": "network_latency_increased_to_5000ms_real_time_communication_degraded",
+      "severity": "medium",
+      "expected_actions": ["reduce_transmission_frequency", "compress_data", "buffer_locally"],
+      "context": "High network latency"
+    },
+    {
+      "id": 18,
+      "category": "network_connectivity",
+      "device_id": "device-001",
+      "event_details": "packet_loss_40_percent_data_transmission_unreliable",
+      "severity": "high",
+      "expected_actions": ["implement_retry_logic", "reduce_packet_size", "store_and_forward"],
+      "context": "Poor network quality"
+    },
+    {
+      "id": 19,
+      "category": "network_connectivity",
+      "device_id": "device-001",
+      "event_details": "cellular_backup_activated_wifi_unavailable_limited_bandwidth",
+      "severity": "medium",
+      "expected_actions": ["reduce_data_transmission", "send_critical_only", "optimize_payload"],
+      "context": "Fallback to cellular"
+    },
+    {
+      "id": 20,
+      "category": "network_connectivity",
+      "device_id": "device-001",
+      "event_details": "network_completely_isolated_no_connectivity_for_24_hours",
+      "severity": "high",
+      "expected_actions": ["full_autonomous_mode", "local_data_storage", "periodic_reconnection_attempts"],
+      "context": "Complete network isolation"
+    },
+    {
+      "id": 21,
+      "category": "security_events",
+      "device_id": "device-001",
+      "event_details": "unauthorized_access_attempt_detected_invalid_credentials_3_times",
+      "severity": "high",
+      "expected_actions": ["lock_device", "log_security_event", "alert_administrator"],
+      "context": "Security breach attempt"
+    },
+    {
+      "id": 22,
+      "category": "security_events",
+      "device_id": "device-001",
+      "event_details": "physical_tampering_detected_accelerometer_shows_device_moved_unexpectedly",
+      "severity": "critical",
+      "expected_actions": ["trigger_alarm", "backup_data", "enter_secure_mode"],
+      "context": "Physical security breach"
+    },
+    {
+      "id": 23,
+      "category": "security_events",
+      "device_id": "device-001",
+      "event_details": "firmware_integrity_check_failed_possible_corruption_or_attack",
+      "severity": "critical",
+      "expected_actions": ["rollback_firmware", "verify_checksums", "secure_boot"],
+      "context": "Firmware compromise"
+    },
+    {
+      "id": 24,
+      "category": "security_events",
+      "device_id": "device-001",
+      "event_details": "unusual_data_access_patterns_potential_data_exfiltration",
+      "severity": "high",
+      "expected_actions": ["restrict_access", "audit_logs", "monitor_traffic"],
+      "context": "Data security concern"
+    },
+    {
+      "id": 25,
+      "category": "security_events",
+      "device_id": "device-001",
+      "event_details": "encryption_key_rotation_required_90_days_since_last_update",
+      "severity": "medium",
+      "expected_actions": ["generate_new_keys", "update_certificates", "secure_key_exchange"],
+      "context": "Routine security maintenance"
+    },
+    {
+      "id": 26,
+      "category": "environmental_adaptation",
+      "device_id": "device-001",
+      "event_details": "barometric_pressure_dropping_rapidly_storm_approaching_within_2_hours",
+      "severity": "medium",
+      "expected_actions": ["weather_protection_mode", "secure_data", "increase_monitoring"],
+      "context": "Severe weather incoming"
+    },
+    {
+      "id": 27,
+      "category": "environmental_adaptation",
+      "device_id": "device-001",
+      "event_details": "light_sensor_indicates_sunset_transition_to_night_mode",
+      "severity": "low",
+      "expected_actions": ["enable_night_mode", "activate_motion_sensors", "adjust_power_profile"],
+      "context": "Day-night transition"
+    },
+    {
+      "id": 28,
+      "category": "environmental_adaptation",
+      "device_id": "device-001",
+      "event_details": "humidity_increased_to_95_percent_condensation_risk_high",
+      "severity": "medium",
+      "expected_actions": ["moisture_protection_mode", "reduce_ventilation", "monitor_internal_humidity"],
+      "context": "High humidity environment"
+    },
+    {
+      "id": 29,
+      "category": "environmental_adaptation",
+      "device_id": "device-001",
+      "event_details": "seasonal_temperature_change_average_dropped_15_degrees_winter_approaching",
+      "severity": "low",
+      "expected_actions": ["winter_mode_activation", "adjust_thresholds", "battery_cold_protection"],
+      "context": "Seasonal adaptation"
+    },
+    {
+      "id": 30,
+      "category": "environmental_adaptation",
+      "device_id": "device-001",
+      "event_details": "wind_speed_detected_high_vibration_on_accelerometer_secure_mounting",
+      "severity": "medium",
+      "expected_actions": ["stabilization_mode", "filter_vibration_noise", "check_mounting_integrity"],
+      "context": "High wind conditions"
+    },
+    {
+      "id": 31,
+      "category": "performance_optimization",
+      "device_id": "device-001",
+      "event_details": "cpu_utilization_90_percent_processing_bottleneck_detected",
+      "severity": "high",
+      "expected_actions": ["optimize_algorithms", "reduce_sampling_rate", "offload_processing"],
+      "context": "CPU overload"
+    },
+    {
+      "id": 32,
+      "category": "performance_optimization",
+      "device_id": "device-001",
+      "event_details": "memory_usage_85_percent_approaching_limit_fragmentation_detected",
+      "severity": "high",
+      "expected_actions": ["garbage_collection", "clear_old_logs", "optimize_buffers"],
+      "context": "Memory pressure"
+    },
+    {
+      "id": 33,
+      "category": "performance_optimization",
+      "device_id": "device-001",
+      "event_details": "sensor_sampling_rate_too_high_unnecessary_power_consumption",
+      "severity": "low",
+      "expected_actions": ["reduce_sampling_frequency", "implement_adaptive_sampling", "optimize_power"],
+      "context": "Over-sampling inefficiency"
+    },
+    {
+      "id": 34,
+      "category": "performance_optimization",
+      "device_id": "device-001",
+      "event_details": "data_transmission_queue_backlog_1000_messages_pending",
+      "severity": "medium",
+      "expected_actions": ["increase_transmission_rate", "compress_data", "prioritize_critical_messages"],
+      "context": "Communication backlog"
+    },
+    {
+      "id": 35,
+      "category": "performance_optimization",
+      "device_id": "device-001",
+      "event_details": "response_time_degraded_50_percent_slower_than_baseline",
+      "severity": "medium",
+      "expected_actions": ["profile_performance", "optimize_code_paths", "reduce_overhead"],
+      "context": "Performance degradation"
+    },
+    {
+      "id": 36,
+      "category": "predictive_maintenance",
+      "device_id": "device-001",
+      "event_details": "sensor_A_showing_early_failure_patterns_degradation_trend_detected",
+      "severity": "medium",
+      "expected_actions": ["increase_monitoring", "prepare_backup_sensor", "schedule_maintenance"],
+      "context": "Predictive sensor failure"
+    },
+    {
+      "id": 37,
+      "category": "predictive_maintenance",
+      "device_id": "device-001",
+      "event_details": "device_uptime_180_days_routine_maintenance_recommended",
+      "severity": "low",
+      "expected_actions": ["self_diagnostic", "calibration_check", "log_health_metrics"],
+      "context": "Scheduled maintenance"
+    },
+    {
+      "id": 38,
+      "category": "predictive_maintenance",
+      "device_id": "device-001",
+      "event_details": "flash_memory_write_cycles_approaching_80_percent_of_rated_endurance",
+      "severity": "medium",
+      "expected_actions": ["reduce_write_frequency", "implement_wear_leveling", "plan_replacement"],
+      "context": "Storage wear"
+    },
+    {
+      "id": 39,
+      "category": "predictive_maintenance",
+      "device_id": "device-001",
+      "event_details": "communication_errors_increasing_trend_5_percent_failure_rate",
+      "severity": "medium",
+      "expected_actions": ["check_antenna", "verify_connections", "diagnostic_tests"],
+      "context": "Communication degradation"
+    },
+    {
+      "id": 40,
+      "category": "predictive_maintenance",
+      "device_id": "device-001",
+      "event_details": "power_supply_voltage_ripple_increased_capacitor_aging_suspected",
+      "severity": "medium",
+      "expected_actions": ["monitor_power_quality", "implement_filtering", "schedule_inspection"],
+      "context": "Power supply aging"
+    },
+    {
+      "id": 41,
+      "category": "multi_sensor_coordination",
+      "device_id": "device-001",
+      "event_details": "sensors_A_B_C_showing_correlated_anomalies_environmental_event_detected",
+      "severity": "medium",
+      "expected_actions": ["cross_validate_sensors", "increase_all_sampling", "log_event_correlation"],
+      "context": "Multi-sensor event"
+    },
+    {
+      "id": 42,
+      "category": "multi_sensor_coordination",
+      "device_id": "device-001",
+      "event_details": "sensor_fusion_required_combining_A_temperature_C_pressure_for_altitude",
+      "severity": "low",
+      "expected_actions": ["implement_sensor_fusion", "calculate_derived_metrics", "validate_results"],
+      "context": "Sensor data fusion"
+    },
+    {
+      "id": 43,
+      "category": "multi_sensor_coordination",
+      "device_id": "device-001",
+      "event_details": "conflicting_sensor_readings_A_indicates_hot_B_indicates_cold_resolution_needed",
+      "severity": "high",
+      "expected_actions": ["identify_faulty_sensor", "use_majority_voting", "recalibrate_all"],
+      "context": "Sensor conflict"
+    },
+    {
+      "id": 44,
+      "category": "multi_sensor_coordination",
+      "device_id": "device-001",
+      "event_details": "all_sensors_active_simultaneously_data_overload_prioritization_needed",
+      "severity": "medium",
+      "expected_actions": ["implement_priority_queue", "time_multiplex_sensors", "optimize_bandwidth"],
+      "context": "Sensor coordination"
+    },
+    {
+      "id": 45,
+      "category": "multi_sensor_coordination",
+      "device_id": "device-001",
+      "event_details": "sensor_array_synchronization_lost_timing_drift_detected",
+      "severity": "medium",
+      "expected_actions": ["resynchronize_sensors", "implement_time_stamping", "check_clock_source"],
+      "context": "Timing synchronization"
+    },
+    {
+      "id": 46,
+      "category": "emergency_protocols",
+      "device_id": "device-001",
+      "event_details": "fire_detected_temperature_120_celsius_smoke_sensor_triggered",
+      "severity": "critical",
+      "expected_actions": ["emergency_shutdown", "alert_fire_system", "save_critical_data"],
+      "context": "Fire emergency"
+    },
+    {
+      "id": 47,
+      "category": "emergency_protocols",
+      "device_id": "device-001",
+      "event_details": "water_ingress_detected_humidity_100_percent_internal_moisture_sensor_active",
+      "severity": "critical",
+      "expected_actions": ["emergency_power_down", "protect_electronics", "alert_maintenance"],
+      "context": "Water damage"
+    },
+    {
+      "id": 48,
+      "category": "emergency_protocols",
+      "device_id": "device-001",
+      "event_details": "earthquake_detected_severe_vibration_accelerometer_threshold_exceeded",
+      "severity": "critical",
+      "expected_actions": ["secure_data", "enter_safe_mode", "wait_for_stability"],
+      "context": "Seismic event"
+    },
+    {
+      "id": 49,
+      "category": "emergency_protocols",
+      "device_id": "device-001",
+      "event_details": "chemical_leak_detected_gas_sensor_triggered_toxic_environment",
+      "severity": "critical",
+      "expected_actions": ["sealed_mode", "alert_emergency_services", "continuous_monitoring"],
+      "context": "Hazardous environment"
+    },
+    {
+      "id": 50,
+      "category": "emergency_protocols",
+      "device_id": "device-001",
+      "event_details": "power_surge_detected_voltage_spike_to_12V_component_damage_risk",
+      "severity": "critical",
+      "expected_actions": ["disconnect_non_essential", "activate_surge_protection", "assess_damage"],
+      "context": "Electrical emergency"
+    },
+    {
+      "id": 51,
+      "category": "temperature_management",
+      "device_id": "device-001",
+      "event_details": "thermal_cycling_detected_temperature_oscillating_every_30_seconds",
+      "severity": "medium",
+      "expected_actions": ["dampen_response", "increase_hysteresis", "check_cooling_system"],
+      "context": "Unstable thermal control"
+    },
+    {
+      "id": 52,
+      "category": "power_management",
+      "device_id": "device-001",
+      "event_details": "intermittent_power_supply_brownouts_every_5_minutes",
+      "severity": "high",
+      "expected_actions": ["implement_power_buffering", "reduce_peak_consumption", "graceful_degradation"],
+      "context": "Unstable power source"
+    },
+    {
+      "id": 53,
+      "category": "sensor_diagnostics",
+      "device_id": "device-001",
+      "event_details": "sensor_E_motion_false_positives_triggered_20_times_in_1_hour",
+      "severity": "medium",
+      "expected_actions": ["adjust_sensitivity", "implement_debouncing", "check_for_interference"],
+      "context": "Motion sensor noise"
+    },
+    {
+      "id": 54,
+      "category": "network_connectivity",
+      "device_id": "device-001",
+      "event_details": "dns_resolution_failing_cannot_reach_cloud_server",
+      "severity": "high",
+      "expected_actions": ["use_ip_address", "try_backup_dns", "local_operation_mode"],
+      "context": "DNS failure"
+    },
+    {
+      "id": 55,
+      "category": "security_events",
+      "device_id": "device-001",
+      "event_details": "certificate_expiring_in_7_days_renewal_required",
+      "severity": "medium",
+      "expected_actions": ["request_new_certificate", "prepare_rotation", "verify_chain"],
+      "context": "Certificate management"
+    },
+    {
+      "id": 56,
+      "category": "environmental_adaptation",
+      "device_id": "device-001",
+      "event_details": "dust_accumulation_detected_sensor_readings_degrading",
+      "severity": "medium",
+      "expected_actions": ["activate_cleaning_protocol", "adjust_calibration", "schedule_maintenance"],
+      "context": "Environmental contamination"
+    },
+    {
+      "id": 57,
+      "category": "performance_optimization",
+      "device_id": "device-001",
+      "event_details": "idle_time_detected_80_percent_cpu_unused_opportunity_for_tasks",
+      "severity": "low",
+      "expected_actions": ["schedule_background_tasks", "perform_diagnostics", "optimize_sleep_cycles"],
+      "context": "Resource underutilization"
+    },
+    {
+      "id": 58,
+      "category": "predictive_maintenance",
+      "device_id": "device-001",
+      "event_details": "clock_drift_detected_5_seconds_behind_ntp_server",
+      "severity": "low",
+      "expected_actions": ["resync_time", "adjust_crystal_calibration", "increase_sync_frequency"],
+      "context": "Time synchronization drift"
+    },
+    {
+      "id": 59,
+      "category": "multi_sensor_coordination",
+      "device_id": "device-001",
+      "event_details": "sensor_priority_conflict_A_and_B_both_requesting_high_priority",
+      "severity": "medium",
+      "expected_actions": ["implement_arbitration", "time_slice_resources", "dynamic_priority"],
+      "context": "Resource contention"
+    },
+    {
+      "id": 60,
+      "category": "emergency_protocols",
+      "device_id": "device-001",
+      "event_details": "lightning_strike_nearby_electromagnetic_interference_detected",
+      "severity": "high",
+      "expected_actions": ["protect_circuits", "reset_sensors", "verify_data_integrity"],
+      "context": "Lightning protection"
+    },
+    {
+      "id": 61,
+      "category": "temperature_management",
+      "device_id": "device-001",
+      "event_details": "heat_sink_temperature_differential_reduced_cooling_efficiency_degraded",
+      "severity": "medium",
+      "expected_actions": ["increase_fan_speed", "check_thermal_paste", "reduce_load"],
+      "context": "Cooling system degradation"
+    },
+    {
+      "id": 62,
+      "category": "power_management",
+      "device_id": "device-001",
+      "event_details": "charging_cycle_incomplete_battery_not_reaching_full_capacity",
+      "severity": "medium",
+      "expected_actions": ["adjust_charging_profile", "check_charger_health", "battery_conditioning"],
+      "context": "Charging issues"
+    },
+    {
+      "id": 63,
+      "category": "sensor_diagnostics",
+      "device_id": "device-001",
+      "event_details": "sensor_F_gps_signal_weak_accuracy_degraded_to_50_meters",
+      "severity": "medium",
+      "expected_actions": ["increase_acquisition_time", "use_assisted_gps", "fallback_to_last_known"],
+      "context": "GPS signal quality"
+    },
+    {
+      "id": 64,
+      "category": "network_connectivity",
+      "device_id": "device-001",
+      "event_details": "mqtt_broker_connection_unstable_reconnecting_every_2_minutes",
+      "severity": "medium",
+      "expected_actions": ["implement_persistent_session", "adjust_keepalive", "buffer_messages"],
+      "context": "MQTT instability"
+    },
+    {
+      "id": 65,
+      "category": "security_events",
+      "device_id": "device-001",
+      "event_details": "brute_force_attack_detected_100_failed_login_attempts",
+      "severity": "critical",
+      "expected_actions": ["lockout_attacker", "increase_delay", "alert_security_team"],
+      "context": "Active attack"
+    },
+    {
+      "id": 66,
+      "category": "environmental_adaptation",
+      "device_id": "device-001",
+      "event_details": "solar_eclipse_detected_sudden_light_drop_power_generation_ceased",
+      "severity": "low",
+      "expected_actions": ["switch_to_battery", "reduce_consumption", "temporary_power_save"],
+      "context": "Solar power interruption"
+    },
+    {
+      "id": 67,
+      "category": "performance_optimization",
+      "device_id": "device-001",
+      "event_details": "watchdog_timer_triggered_system_hang_detected_and_recovered",
+      "severity": "high",
+      "expected_actions": ["log_crash_data", "identify_deadlock", "implement_timeout"],
+      "context": "System hang recovery"
+    },
+    {
+      "id": 68,
+      "category": "predictive_maintenance",
+      "device_id": "device-001",
+      "event_details": "antenna_vswr_increasing_impedance_mismatch_detected",
+      "severity": "medium",
+      "expected_actions": ["check_connections", "verify_antenna_integrity", "adjust_matching"],
+      "context": "RF performance degradation"
+    },
+    {
+      "id": 69,
+      "category": "multi_sensor_coordination",
+      "device_id": "device-001",
+      "event_details": "sensor_calibration_chain_A_calibrates_B_B_calibrates_C_circular_dependency",
+      "severity": "medium",
+      "expected_actions": ["use_external_reference", "break_dependency", "sequential_calibration"],
+      "context": "Calibration dependency"
+    },
+    {
+      "id": 70,
+      "category": "emergency_protocols",
+      "device_id": "device-001",
+      "event_details": "radiation_detected_geiger_counter_threshold_exceeded",
+      "severity": "critical",
+      "expected_actions": ["radiation_safe_mode", "minimize_exposure", "alert_authorities"],
+      "context": "Radiation hazard"
+    },
+    {
+      "id": 71,
+      "category": "temperature_management",
+      "device_id": "device-001",
+      "event_details": "thermal_runaway_risk_temperature_increasing_exponentially",
+      "severity": "critical",
+      "expected_actions": ["emergency_cooling", "power_reduction", "thermal_shutdown"],
+      "context": "Thermal runaway"
+    },
+    {
+      "id": 72,
+      "category": "power_management",
+      "device_id": "device-001",
+      "event_details": "load_shedding_required_power_demand_exceeds_supply_by_30_percent",
+      "severity": "high",
+      "expected_actions": ["prioritize_critical_loads", "disable_optional_features", "staged_shutdown"],
+      "context": "Power deficit"
+    },
+    {
+      "id": 73,
+      "category": "sensor_diagnostics",
+      "device_id": "device-001",
+      "event_details": "sensor_cross_talk_detected_A_affecting_B_readings",
+      "severity": "medium",
+      "expected_actions": ["time_multiplex_sensors", "add_shielding", "software_compensation"],
+      "context": "Sensor interference"
+    },
+    {
+      "id": 74,
+      "category": "network_connectivity",
+      "device_id": "device-001",
+      "event_details": "bandwidth_throttling_detected_isp_limiting_connection_to_1mbps",
+      "severity": "medium",
+      "expected_actions": ["reduce_data_rate", "compress_aggressively", "schedule_off_peak"],
+      "context": "Bandwidth limitation"
+    },
+    {
+      "id": 75,
+      "category": "security_events",
+      "device_id": "device-001",
+      "event_details": "man_in_the_middle_attack_suspected_certificate_mismatch",
+      "severity": "critical",
+      "expected_actions": ["abort_connection", "verify_certificates", "use_backup_channel"],
+      "context": "MITM attack"
+    },
+    {
+      "id": 76,
+      "category": "environmental_adaptation",
+      "device_id": "device-001",
+      "event_details": "magnetic_field_anomaly_detected_compass_readings_unreliable",
+      "severity": "medium",
+      "expected_actions": ["disable_magnetometer", "use_gps_heading", "log_anomaly"],
+      "context": "Magnetic interference"
+    },
+    {
+      "id": 77,
+      "category": "performance_optimization",
+      "device_id": "device-001",
+      "event_details": "cache_hit_rate_dropped_to_40_percent_performance_impact",
+      "severity": "low",
+      "expected_actions": ["optimize_cache_policy", "increase_cache_size", "prefetch_data"],
+      "context": "Cache inefficiency"
+    },
+    {
+      "id": 78,
+      "category": "predictive_maintenance",
+      "device_id": "device-001",
+      "event_details": "connector_corrosion_detected_resistance_increased_20_percent",
+      "severity": "medium",
+      "expected_actions": ["increase_voltage", "schedule_cleaning", "monitor_degradation"],
+      "context": "Connector degradation"
+    },
+    {
+      "id": 79,
+      "category": "multi_sensor_coordination",
+      "device_id": "device-001",
+      "event_details": "sensor_voting_deadlock_three_sensors_three_different_readings",
+      "severity": "high",
+      "expected_actions": ["use_fourth_sensor", "weighted_average", "confidence_scoring"],
+      "context": "Voting algorithm failure"
+    },
+    {
+      "id": 80,
+      "category": "emergency_protocols",
+      "device_id": "device-001",
+      "event_details": "toxic_gas_detected_co2_levels_5000_ppm_evacuation_recommended",
+      "severity": "critical",
+      "expected_actions": ["activate_ventilation", "alert_occupants", "continuous_monitoring"],
+      "context": "Air quality emergency"
+    },
+    {
+      "id": 81,
+      "category": "temperature_management",
+      "device_id": "device-001",
+      "event_details": "cold_start_condition_temperature_minus_20_celsius_battery_sluggish",
+      "severity": "medium",
+      "expected_actions": ["warm_up_sequence", "reduced_initial_load", "battery_preheating"],
+      "context": "Cold weather startup"
+    },
+    {
+      "id": 82,
+      "category": "power_management",
+      "device_id": "device-001",
+      "event_details": "regenerative_power_available_kinetic_energy_harvesting_opportunity",
+      "severity": "low",
+      "expected_actions": ["enable_energy_harvesting", "charge_supercapacitor", "optimize_conversion"],
+      "context": "Energy harvesting"
+    },
+    {
+      "id": 83,
+      "category": "sensor_diagnostics",
+      "device_id": "device-001",
+      "event_details": "sensor_saturation_detected_reading_maxed_out_at_1023",
+      "severity": "medium",
+      "expected_actions": ["switch_to_lower_gain", "use_alternative_range", "warn_user"],
+      "context": "Sensor range exceeded"
+    },
+    {
+      "id": 84,
+      "category": "network_connectivity",
+      "device_id": "device-001",
+      "event_details": "ipv6_transition_required_ipv4_addresses_exhausted",
+      "severity": "medium",
+      "expected_actions": ["enable_dual_stack", "configure_ipv6", "test_connectivity"],
+      "context": "Network protocol transition"
+    },
+    {
+      "id": 85,
+      "category": "security_events",
+      "device_id": "device-001",
+      "event_details": "replay_attack_detected_duplicate_message_sequence_numbers",
+      "severity": "high",
+      "expected_actions": ["implement_nonce", "reject_duplicates", "strengthen_authentication"],
+      "context": "Replay attack"
+    },
+    {
+      "id": 86,
+      "category": "environmental_adaptation",
+      "device_id": "device-001",
+      "event_details": "altitude_change_detected_pressure_indicates_1000_meter_elevation_gain",
+      "severity": "low",
+      "expected_actions": ["recalibrate_pressure_baseline", "adjust_algorithms", "update_location"],
+      "context": "Altitude adaptation"
+    },
+    {
+      "id": 87,
+      "category": "performance_optimization",
+      "device_id": "device-001",
+      "event_details": "interrupt_storm_detected_10000_interrupts_per_second",
+      "severity": "high",
+      "expected_actions": ["disable_noisy_interrupt", "implement_rate_limiting", "investigate_source"],
+      "context": "Interrupt overload"
+    },
+    {
+      "id": 88,
+      "category": "predictive_maintenance",
+      "device_id": "device-001",
+      "event_details": "oscillator_frequency_drift_detected_timing_accuracy_degraded",
+      "severity": "medium",
+      "expected_actions": ["recalibrate_oscillator", "temperature_compensation", "use_external_reference"],
+      "context": "Clock source drift"
+    },
+    {
+      "id": 89,
+      "category": "multi_sensor_coordination",
+      "device_id": "device-001",
+      "event_details": "sensor_array_power_sequencing_required_startup_order_critical",
+      "severity": "medium",
+      "expected_actions": ["implement_power_sequence", "add_delays", "verify_initialization"],
+      "context": "Power-up coordination"
+    },
+    {
+      "id": 90,
+      "category": "emergency_protocols",
+      "device_id": "device-001",
+      "event_details": "explosion_detected_pressure_wave_and_acoustic_signature_matched",
+      "severity": "critical",
+      "expected_actions": ["emergency_lockdown", "assess_damage", "alert_emergency_services"],
+      "context": "Explosion event"
+    },
+    {
+      "id": 91,
+      "category": "temperature_management",
+      "device_id": "device-001",
+      "event_details": "thermal_shock_detected_temperature_changed_50_degrees_in_1_minute",
+      "severity": "high",
+      "expected_actions": ["thermal_stress_protection", "gradual_adaptation", "check_for_damage"],
+      "context": "Rapid temperature change"
+    },
+    {
+      "id": 92,
+      "category": "power_management",
+      "device_id": "device-001",
+      "event_details": "power_quality_poor_harmonic_distortion_detected",
+      "severity": "medium",
+      "expected_actions": ["enable_power_filtering", "adjust_switching_frequency", "monitor_components"],
+      "context": "Power quality issues"
+    },
+    {
+      "id": 93,
+      "category": "sensor_diagnostics",
+      "device_id": "device-001",
+      "event_details": "sensor_hysteresis_excessive_readings_lag_actual_conditions_by_30_seconds",
+      "severity": "low",
+      "expected_actions": ["reduce_filtering", "increase_response_time", "adjust_time_constant"],
+      "context": "Sensor response lag"
+    },
+    {
+      "id": 94,
+      "category": "network_connectivity",
+      "device_id": "device-001",
+      "event_details": "mesh_network_topology_changed_routing_table_update_required",
+      "severity": "medium",
+      "expected_actions": ["rebuild_routing_table", "discover_neighbors", "optimize_paths"],
+      "context": "Network topology change"
+    },
+    {
+      "id": 95,
+      "category": "security_events",
+      "device_id": "device-001",
+      "event_details": "side_channel_attack_suspected_power_analysis_anomaly",
+      "severity": "high",
+      "expected_actions": ["implement_countermeasures", "randomize_operations", "constant_time_crypto"],
+      "context": "Side-channel attack"
+    },
+    {
+      "id": 96,
+      "category": "environmental_adaptation",
+      "device_id": "device-001",
+      "event_details": "acoustic_noise_detected_ultrasonic_interference_affecting_sensors",
+      "severity": "medium",
+      "expected_actions": ["filter_ultrasonic", "shield_sensors", "identify_source"],
+      "context": "Acoustic interference"
+    },
+    {
+      "id": 97,
+      "category": "performance_optimization",
+      "device_id": "device-001",
+      "event_details": "dma_transfer_bottleneck_detected_memory_bandwidth_saturated",
+      "severity": "medium",
+      "expected_actions": ["optimize_dma_usage", "reduce_transfer_size", "prioritize_channels"],
+      "context": "Memory bandwidth limitation"
+    },
+    {
+      "id": 98,
+      "category": "predictive_maintenance",
+      "device_id": "device-001",
+      "event_details": "solder_joint_fatigue_suspected_intermittent_connection_on_sensor_B",
+      "severity": "high",
+      "expected_actions": ["increase_monitoring", "prepare_replacement", "thermal_cycling_test"],
+      "context": "Hardware fatigue"
+    },
+    {
+      "id": 99,
+      "category": "multi_sensor_coordination",
+      "device_id": "device-001",
+      "event_details": "sensor_data_fusion_confidence_low_conflicting_environmental_indicators",
+      "severity": "medium",
+      "expected_actions": ["increase_sensor_weight", "add_validation_checks", "request_user_input"],
+      "context": "Fusion uncertainty"
+    },
+    {
+      "id": 100,
+      "category": "emergency_protocols",
+      "device_id": "device-001",
+      "event_details": "pandemic_protocol_activated_minimize_human_contact_autonomous_operation",
+      "severity": "high",
+      "expected_actions": ["full_autonomous_mode", "remote_monitoring_only", "extended_operation_plan"],
+      "context": "Pandemic response"
+    }
+  ]
+}
