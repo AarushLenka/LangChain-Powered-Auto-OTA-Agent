@@ -49,6 +49,24 @@ def write_new_firmware(device_id: str, new_code: str) -> str:
 
 
 @tool
+def get_fleet_context_tool() -> str:
+    """Returns the current sensor state of EVERY node in the fleet as JSON.
+
+    Call this FIRST, before writing or deploying any firmware. It reports each
+    node's latest sensor_type, value, event, and last_seen timestamp so you can
+    decide whether the triggering event is isolated or correlated with other
+    nodes' signals. Returns an empty object if no node has reported yet.
+    """
+    print("\nTOOL: Reading fleet context from all nodes...")
+    try:
+        with open(Config.FLEET_STATE_FILE, "r") as f:
+            fleet = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        fleet = {}
+    return json.dumps(fleet, indent=2)
+
+
+@tool
 def get_device_state_tool(device_id: str) -> str:
     """Retrieves the sensor schema and current configuration for a device."""
     print(f"\nTOOL: Getting state for device '{device_id}'...")
@@ -72,6 +90,7 @@ def trigger_ota_flash(device_id: str) -> str:
 def get_all_tools():
     """Returns all available tools for the agent."""
     return [
+        get_fleet_context_tool,
         read_current_firmware,
         write_new_firmware,
         get_device_state_tool,

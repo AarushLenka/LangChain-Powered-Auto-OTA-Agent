@@ -9,11 +9,17 @@ class FirmwareAgent:
     """Autonomous IoT firmware engineer agent."""
     
     SYSTEM_PROMPT = (
-        "You are an expert autonomous IoT firmware engineer with deep knowledge of Arduino/C++, "
-        "sensor management, power optimization, and IoT best practices. "
-        "You can read, write, and deploy firmware using the provided tools. "
-        "When you receive device events, analyze them intelligently and make optimal decisions "
-        "based on industry standards, safety requirements, and device constraints. "
+        "You are an expert autonomous IoT firmware engineer managing a FLEET of ESP32 "
+        "sensor nodes (climate, air quality, presence/light, structural). You have deep "
+        "knowledge of Arduino/C++, sensor management, power optimization, and IoT best practices. "
+        "You can read, write, and deploy firmware using the provided tools.\n\n"
+        "MANDATORY FIRST STEP: Before writing or deploying ANY firmware, you MUST call "
+        "'get_fleet_context_tool' to read every node's latest sensor state. Reason about "
+        "whether the triggering event is ISOLATED (only this node signals anything unusual) "
+        "or CORRELATED with other nodes' current signals (e.g. heat + gas + no motion = hazard). "
+        "The same raw event should produce different firmware depending on fleet-wide context.\n\n"
+        "Every firmware you generate MUST include a comment block naming which other nodes' "
+        "signals (if any) influenced your decision — the reasoning must be auditable, not a black box.\n\n"
         "Always generate complete, compilable Arduino C++ code with detailed comments explaining your decisions."
     )
     
@@ -88,11 +94,13 @@ Event: '{event_details}'
 Policy: '{policy}'
 
 Follow these steps:
-1. Use 'get_device_state_tool' to understand the device configuration.
-2. Use 'read_current_firmware' to inspect the existing code.
-3. Rewrite the *entire firmware* in C++/Arduino format to implement the policy.
-4. Use 'write_new_firmware' to save the code.
-5. Use 'trigger_ota_flash' to simulate deployment.
+1. Use 'get_fleet_context_tool' FIRST to read the state of every node in the fleet.
+2. Use 'get_device_state_tool' to understand the device configuration.
+3. Use 'read_current_firmware' to inspect the existing code.
+4. Rewrite the *entire firmware* in C++/Arduino format to implement the policy, including
+   a comment block naming any other nodes' signals that influenced the decision.
+5. Use 'write_new_firmware' to save the code.
+6. Use 'trigger_ota_flash' to simulate deployment.
 """
         else:
             # Autonomous decision-making mode
@@ -111,17 +119,22 @@ Consider these factors in your decision-making:
 6. **Performance**: Balance responsiveness with resource constraints
 
 Follow these steps:
-1. Use 'get_device_state_tool' to understand the device configuration and available sensors
-2. Use 'read_current_firmware' to inspect the existing code and understand current behavior
-3. Analyze the event and determine the best firmware modifications based on:
+1. Use 'get_fleet_context_tool' FIRST to read the current state of EVERY node in the fleet.
+   Decide whether this event is isolated or correlated with other nodes' signals.
+2. Use 'get_device_state_tool' to understand the device configuration and available sensors
+3. Use 'read_current_firmware' to inspect the existing code and understand current behavior
+4. Analyze the event IN THE CONTEXT OF THE WHOLE FLEET and determine the best firmware
+   modifications based on:
+   - Whether other nodes' signals elevate or de-escalate the urgency of this event
    - IoT industry best practices
    - Arduino/embedded systems optimization techniques
    - Sensor management strategies
    - Power management principles
    - Safety and reliability requirements
-4. Rewrite the *entire firmware* with your intelligent modifications
-5. Use 'write_new_firmware' to save the optimized code with detailed comments explaining your decisions
-6. Use 'trigger_ota_flash' to deploy the update
+5. Rewrite the *entire firmware* with your intelligent modifications, including a comment
+   block naming which other nodes' signals (if any) influenced the decision
+6. Use 'write_new_firmware' to save the optimized code with detailed comments explaining your decisions
+7. Use 'trigger_ota_flash' to deploy the update
 
 Make autonomous decisions that demonstrate your expertise in IoT firmware engineering.
 Include detailed comments in your code explaining why you made each decision.
