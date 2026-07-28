@@ -2,22 +2,27 @@
 
 Sequenced backlog. Items are grouped by phase; within a phase, do them roughly top to bottom, since later items in a phase often assume earlier ones are done. Do not start a later phase's items while an earlier phase has open blocking items, unless explicitly told to jump ahead.
 
-## Phase 1 — Single-Laptop Fleet (current phase, in progress)
+## Phase 1 — Single-Laptop Fleet (current phase, one item open)
 
-- [ ] Fold OTA/fleet/dashboard routes into `ota_agent/app.py` (single process, single port)
-- [ ] Implement `get_fleet_context_tool()` and wire it into the agent's system prompt as a mandatory pre-firmware-write step
-- [ ] Implement `push_firmware_to_multiple_nodes()` and give the agent explicit criteria (in its system prompt) for when to use it vs single-node deployment
-- [ ] Split each node's ESP32 sketch into a shared, non-regenerable skeleton + a per-node sensor block template (`ota_agent/templates/`)
+- [x] Fold OTA/fleet/dashboard routes into `ota_agent/app.py` (single process, single port)
+- [x] Implement `get_fleet_context_tool()` and wire it into the agent's system prompt as a mandatory pre-firmware-write step
+- [x] Implement `push_firmware_to_multiple_nodes()` and give the agent explicit criteria (in its system prompt) for when to use it vs single-node deployment
+- [x] Split each node's ESP32 sketch into a shared, non-regenerable skeleton + a per-node sensor block template (`ota_agent/templates/`)
 - [ ] Flash and validate all four node roles (`node-climate`, `node-air`, `node-presence`, `node-structural`) against the laptop-hosted server
-- [ ] Add at least 5 new scenarios to `training_data.json` that specifically test cross-sensor correlation (not just single-sensor thresholds) — e.g. "temp critical + gas critical + no motion" vs "temp critical alone"
-- [ ] Confirm dashboard (`/dashboard`) correctly reflects live multi-node state during a correlated-event test
+      — **blocked on hardware.** Needs the four ESP32 boards plus `arduino-cli` with the `esp32:esp32` core installed. Everything up to the compile step is done and tested; the real compile path in `compile_and_deploy_firmware` has never been executed.
+- [x] Add at least 5 new scenarios to `training_data.json` that specifically test cross-sensor correlation (not just single-sensor thresholds) — e.g. "temp critical + gas critical + no motion" vs "temp critical alone"
+- [x] Confirm dashboard (`/dashboard`) correctly reflects live multi-node state during a correlated-event test
+      — verified with simulated `/report` calls for all four nodes, not with live hardware.
 
 ## Phase 2 — Robustness on Laptop (before Pi migration)
 
-- [ ] Add a staleness cutoff to `get_fleet_context_tool()` — discount or flag readings older than a configurable threshold (e.g. 60s) so the agent doesn't reason over stale data during timing races
-- [ ] Normalize error responses across `/check` and `/download` to proper HTTP status codes instead of `200` with an error body (coordinate with `docs/API_SPEC.md` — update the spec in the same change)
-- [ ] Add a basic automated test that exercises `/report` → `/fleet` → agent's fleet-context read, to catch the query-param/JSON-body class of bug going forward
-- [ ] Add a "last known good" firmware retention policy so a failed OTA push can be manually recovered without hunting through `firmware_store/`
+- [x] Add a staleness cutoff to `get_fleet_context_tool()` — discount or flag readings older than a configurable threshold (e.g. 60s) so the agent doesn't reason over stale data during timing races
+- [x] Normalize error responses across `/check` and `/download` to proper HTTP status codes instead of `200` with an error body (coordinate with `docs/API_SPEC.md` — update the spec in the same change)
+      — `/download` now 404s. `/check` deliberately still returns `200 {"update_available": false}` before a device's first upload, since that is a normal state for a USB-flashed node and 404ing it would make every node error-loop.
+- [x] Add a basic automated test that exercises `/report` → `/fleet` → agent's fleet-context read, to catch the query-param/JSON-body class of bug going forward
+      — `test_fleet_flow.py`, runs offline with no server and no API key.
+- [x] Add a "last known good" firmware retention policy so a failed OTA push can be manually recovered without hunting through `firmware_store/`
+      — `/upload` retains the replaced entry as `previous`; `POST /rollback/{device_id}` swaps them.
 
 ## Phase 3 — Raspberry Pi Migration (do not start until explicitly requested)
 
@@ -33,7 +38,7 @@ See `docs/TRD.md` §7 for the full technical plan. High-level sequence:
 These are real, known gaps. They are deliberately not being worked on yet — do not pick these up opportunistically as part of unrelated tasks.
 
 - [ ] API authentication (all endpoints currently unauthenticated)
-- [ ] Automatic rollback on failed/bad firmware
+- [ ] Automatic rollback on failed/bad firmware — manual recovery now exists (`POST /rollback/{device_id}`, Phase 2); making it automatic needs ESP32-side flash/boot verification to decide what "failed" means
 - [ ] Firmware signing / integrity verification before flashing
 - [ ] A/B testing for firmware updates across a subset of the fleet
 - [ ] Web dashboard beyond the current auto-refresh HTML view (e.g. a proper frontend framework, historical charts)
