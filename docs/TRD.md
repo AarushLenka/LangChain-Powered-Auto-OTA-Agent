@@ -302,9 +302,19 @@ assume all four are present.
 
 ```json
 {
-  "node-climate": { "version": "v20260727153000", "path": "firmware_store/node-climate/v20260727153000.bin" }
+  "node-climate": {
+    "version": "v20260727153000",
+    "path": "firmware_store/node-climate/v20260727153000.bin",
+    "previous": { "version": "v20260727120000", "path": "firmware_store/node-climate/v20260727120000.bin" }
+  }
 }
 ```
+
+`previous` is the last known good firmware: `/upload` carries the entry it
+replaces forward, and `POST /rollback/{device_id}` swaps the two so a bad push
+can be recovered without hunting through `firmware_store/` for the right `.bin`.
+Rollback is operator-driven and reversible; nothing is deleted. Automatic
+rollback on a failed flash remains a Phase 4 item.
 
 ---
 

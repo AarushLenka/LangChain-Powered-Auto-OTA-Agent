@@ -59,6 +59,34 @@ Stores a compiled firmware binary and updates the manifest. Called internally by
 { "status": "uploaded", "device_id": "node-climate", "version": "v20260727153000" }
 ```
 
+The manifest entry this replaces is carried forward under `previous`, so the last known good version is recorded by name:
+```json
+{
+  "node-climate": {
+    "version": "v20260727153000",
+    "path": "firmware_store/node-climate/v20260727153000.bin",
+    "previous": { "version": "v20260727120000", "path": "firmware_store/node-climate/v20260727120000.bin" }
+  }
+}
+```
+
+---
+
+### `POST /rollback/{device_id}`
+Repoints a device at its last known good firmware after a bad push. Operator-driven; the node picks the older binary up on its next `/check`. Nothing is deleted — the rolled-back-from version becomes the new `previous`, so this is reversible.
+
+Automatic rollback on a failed flash is a separate deferred item (`ROADMAP.md` Phase 4); this endpoint is manual recovery only.
+
+**Path params:** `device_id` (string)
+
+**Response `200`**
+```json
+{ "status": "rolled_back", "device_id": "node-climate", "version": "v20260727120000", "rolled_back_from": "v20260727153000" }
+```
+
+**Response `404`** — no firmware on record for this device.
+**Response `409`** — no `previous` version recorded, or its binary is missing from `firmware_store/`.
+
 ---
 
 ### `GET /check/{device_id}`

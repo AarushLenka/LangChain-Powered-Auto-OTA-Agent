@@ -156,6 +156,39 @@ def check_update_flag_matches_client_parsing(client: TestClient) -> None:
     assert d.status_code == 200 and d.content == b"REALBIN"
 
 
+def check_rollback_restores_last_known_good(client: TestClient) -> None:
+    """A bad push must be recoverable by name, not by hunting through firmware_store/."""
+    client.post("/upload/node-climate", params={"version": "v1"},
+                files={"file": ("f.bin", b"GOOD")})
+    client.post("/upload/node-climate", params={"version": "v2"},
+                files={"file": ("f.bin", b"BAD")})
+
+    # v2 is live and v1 was retained as the last known good.
+    assert client.get("/download/node-climate").content == b"BAD"
+
+    r = client.post("/rollback/node-climate")
+    assert r.status_code == 200, r.text
+    assert r.json()["version"] == "v1" and r.json()["rolled_back_from"] == "v2"
+
+    # The node now gets the good binary, and the rollback is itself reversible.
+    assert client.get("/download/node-climate").content == b"GOOD"
+    assert client.get("/check/node-climate",
+                      params={"current_version": "v2"}).json()["update_available"] is True
+    assert client.post("/rollback/node-climate").json()["version"] == "v2"
+
+
+def check_rollback_refuses_when_no_previous(client: TestClient) -> None:
+    """Rolling back with nothing to roll back to must fail loudly, not silently no-op."""
+    assert client.post("/rollback/node-climate").status_code == 404  # nothing on record
+
+    client.post("/upload/node-climate", params={"version": "v1"},
+                files={"file": ("f.bin", b"ONLY")})
+    r = client.post("/rollback/node-climate")
+    assert r.status_code == 409, f"expected 409 with no previous version, got {r.status_code}"
+    # The single good version must still be live after the refused rollback.
+    assert client.get("/download/node-climate").content == b"ONLY"
+
+
 CHECKS = [
     check_empty_fleet_is_empty_object,
     check_query_param_report_round_trips,
@@ -164,6 +197,8 @@ CHECKS = [
     check_download_404s_when_no_firmware,
     check_check_stays_200_before_first_upload,
     check_update_flag_matches_client_parsing,
+    check_rollback_restores_last_known_good,
+    check_rollback_refuses_when_no_previous,
 ]
 
 

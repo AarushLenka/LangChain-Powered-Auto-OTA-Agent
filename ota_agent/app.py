@@ -79,6 +79,11 @@ def create_app(agent: FirmwareAgent) -> FastAPI:
         """Store a compiled firmware binary and update the manifest.
 
         Called internally by compile_and_deploy_firmware(), not by ESP32 nodes.
+
+        The entry being replaced is carried forward as "previous" so the version
+        a node was last successfully running is recorded by name, and a bad push
+        can be recovered with POST /rollback/{device_id} instead of guessing
+        which .bin under firmware_store/ was the good one.
         """
         store_dir = os.path.join(Config.FIRMWARE_STORE_DIR, device_id)
         os.makedirs(store_dir, exist_ok=True)
@@ -87,10 +92,49 @@ def create_app(agent: FirmwareAgent) -> FastAPI:
             f.write(await file.read())
 
         manifest = _load_json(Config.MANIFEST_FILE)
-        manifest[device_id] = {"version": version, "path": bin_path}
+        current = manifest.get(device_id)
+        entry = {"version": version, "path": bin_path}
+        # Only demote a real, still-present binary; don't record a dangling one.
+        if current and current.get("version") != version and os.path.exists(current.get("path", "")):
+            entry["previous"] = {"version": current["version"], "path": current["path"]}
+        elif current and "previous" in current:
+            entry["previous"] = current["previous"]  # re-upload of same version keeps history
+        manifest[device_id] = entry
         _save_json(Config.MANIFEST_FILE, manifest)
 
         return {"status": "uploaded", "device_id": device_id, "version": version}
+
+    @app.post("/rollback/{device_id}")
+    async def rollback_firmware(device_id: str):
+        """Repoint a device at its last known good firmware.
+
+        Operator-driven recovery for a bad push: swaps the manifest's current and
+        previous entries so the node picks the older binary up on its next /check.
+        Nothing is deleted, and this is deliberately manual — automatic rollback on
+        a failed flash is a separate, unscoped item (ROADMAP Phase 4).
+        """
+        manifest = _load_json(Config.MANIFEST_FILE)
+        entry = manifest.get(device_id)
+        if not entry:
+            raise HTTPException(status_code=404, detail="no firmware on record")
+        previous = entry.get("previous")
+        if not previous:
+            raise HTTPException(status_code=409, detail="no previous version to roll back to")
+        if not os.path.exists(previous.get("path", "")):
+            raise HTTPException(status_code=409, detail="previous firmware binary is missing")
+
+        manifest[device_id] = {
+            "version": previous["version"],
+            "path": previous["path"],
+            "previous": {"version": entry["version"], "path": entry["path"]},
+        }
+        _save_json(Config.MANIFEST_FILE, manifest)
+        return {
+            "status": "rolled_back",
+            "device_id": device_id,
+            "version": previous["version"],
+            "rolled_back_from": entry["version"],
+        }
 
     @app.get("/check/{device_id}")
     async def check_update(device_id: str, current_version: str):
