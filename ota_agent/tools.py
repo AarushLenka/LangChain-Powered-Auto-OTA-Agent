@@ -1,9 +1,21 @@
+import glob
 import json
 import os
+import shutil
+import subprocess
+import tempfile
 from datetime import datetime
+
+import requests
 from langchain_core.tools import tool
+
 from .database import DeviceDatabase
 from .config import Config
+
+# ESP32 target + local upload endpoint. arduino-cli must be installed on PATH
+# with core `esp32:esp32` and the DHT/Adafruit libraries (see CLAUDE.md).
+FQBN = "esp32:esp32:esp32"
+UPLOAD_URL = f"http://localhost:{Config.SERVER_PORT}/upload"
 
 
 # Initialize database instance
@@ -87,6 +99,115 @@ def trigger_ota_flash(device_id: str) -> str:
     return log_message
 
 
+@tool
+def compile_and_deploy_firmware(device_id: str) -> str:
+    """Compiles a single node's current firmware with arduino-cli and OTA-deploys it.
+
+    Use this for an ISOLATED event affecting ONE node — when get_fleet_context_tool
+    shows the triggering signal is not correlated with anomalies on other nodes.
+
+    Reads the device's current_firmware_path (.cpp) from the database, compiles it
+    headlessly for the ESP32 target (esp32:esp32:esp32) via arduino-cli, then uploads
+    the resulting .bin to the local OTA server (POST /upload/{device_id}) so manifest.json
+    updates and the node picks it up on its next /check poll.
+
+    Returns a success string naming the device and deployed version, or a clear error
+    string beginning with 'arduino-cli not found', 'COMPILE FAILED:', or 'DEPLOY FAILED:'.
+    This REPLACES the old simulated trigger_ota_flash for real deployment.
+    """
+    print(f"\nTOOL: Compiling and deploying firmware for '{device_id}'...")
+    state = db.get_device_state(device_id)
+    if not state or "current_firmware_path" not in state:
+        return f"COMPILE FAILED: no firmware path in DB for device_id '{device_id}'."
+
+    cpp_path = state["current_firmware_path"]
+    if not os.path.exists(cpp_path):
+        return f"COMPILE FAILED: firmware file not found at '{cpp_path}'."
+
+    if shutil.which("arduino-cli") is None:
+        return (
+            "arduino-cli not found on PATH. Install arduino-cli and the esp32:esp32 "
+            "core plus 'DHT sensor library' + 'Adafruit Unified Sensor' before deploying."
+        )
+
+    # arduino-cli requires the sketch file's basename to match its folder name.
+    version = os.path.splitext(os.path.basename(cpp_path))[0]  # e.g. "v20260727153000"
+    tmp_dir = tempfile.mkdtemp(prefix=f"otabuild-{device_id}-")
+    try:
+        sketch_dir = os.path.join(tmp_dir, version)
+        build_dir = os.path.join(tmp_dir, "build")
+        os.makedirs(sketch_dir, exist_ok=True)
+        shutil.copy(cpp_path, os.path.join(sketch_dir, f"{version}.ino"))
+
+        try:
+            result = subprocess.run(
+                ["arduino-cli", "compile", "--fqbn", FQBN,
+                 "--output-dir", build_dir, sketch_dir],
+                capture_output=True, text=True, timeout=120,
+            )
+        except FileNotFoundError:
+            return "arduino-cli not found on PATH."
+        except subprocess.TimeoutExpired:
+            return "COMPILE FAILED: arduino-cli timed out after 120s."
+
+        if result.returncode != 0:
+            return f"COMPILE FAILED: {(result.stderr or result.stdout).strip()}"
+
+        bins = glob.glob(os.path.join(build_dir, "*.bin"))
+        # Prefer the main application binary over bootloader/partition bins.
+        app_bins = [b for b in bins if "bootloader" not in b and "partition" not in b]
+        bin_path = (app_bins or bins or [None])[0]
+        if not bin_path:
+            return f"COMPILE FAILED: no .bin produced in {build_dir}."
+
+        try:
+            with open(bin_path, "rb") as fh:
+                resp = requests.post(
+                    f"{UPLOAD_URL}/{device_id}",
+                    params={"version": version},
+                    files={"file": (f"{version}.bin", fh, "application/octet-stream")},
+                    timeout=30,
+                )
+        except requests.RequestException as e:
+            return f"DEPLOY FAILED: could not reach OTA server at {UPLOAD_URL}: {e}"
+
+        if resp.status_code != 200:
+            return f"DEPLOY FAILED: upload returned {resp.status_code}: {resp.text}"
+
+        print(f"TOOL: Deployed {version} to {device_id}.")
+        return f"Successfully compiled and deployed firmware {version} to {device_id}."
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+@tool
+def push_firmware_to_multiple_nodes(device_ids: list[str]) -> str:
+    """Compiles and OTA-deploys each listed node's current firmware, fleet-wide.
+
+    Use this ONLY for a CORRELATED multi-node pattern — when get_fleet_context_tool
+    shows several nodes reporting signals that together warrant an elevated firmware
+    profile (e.g. heat on node-climate + gas on node-air + no_motion on node-presence
+    indicating an unoccupied hazard). Do NOT use this for an isolated single-node event;
+    use compile_and_deploy_firmware for that instead. Pass only the device_ids whose
+    firmware you actually rewrote for the correlated response.
+
+    Runs compile_and_deploy_firmware for each device_id (each compiles its OWN current
+    firmware) and returns a per-node success/failure summary. A failure on one node does
+    not abort the others. This REPLACES the old simulated trigger_ota_flash for real
+    fleet-wide deployment.
+    """
+    print(f"\nTOOL: Fleet-wide deploy to {device_ids}...")
+    lines = []
+    ok = 0
+    for device_id in device_ids:
+        result = compile_and_deploy_firmware.invoke({"device_id": device_id})
+        success = result.startswith("Successfully")
+        ok += success
+        lines.append(f"  [{'OK' if success else 'FAIL'}] {device_id}: {result}")
+    header = f"Fleet-wide deploy: {ok}/{len(device_ids)} nodes succeeded."
+    return header + "\n" + "\n".join(lines)
+
+
 def get_all_tools():
     """Returns all available tools for the agent."""
     return [
@@ -94,5 +215,7 @@ def get_all_tools():
         read_current_firmware,
         write_new_firmware,
         get_device_state_tool,
-        trigger_ota_flash
+        trigger_ota_flash,
+        compile_and_deploy_firmware,
+        push_firmware_to_multiple_nodes,
     ]

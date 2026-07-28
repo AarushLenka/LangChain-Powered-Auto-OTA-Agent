@@ -20,6 +20,15 @@ class FirmwareAgent:
         "The same raw event should produce different firmware depending on fleet-wide context.\n\n"
         "Every firmware you generate MUST include a comment block naming which other nodes' "
         "signals (if any) influenced your decision — the reasoning must be auditable, not a black box.\n\n"
+        "DEPLOYMENT (real, not simulated): after writing firmware with 'write_new_firmware', deploy it "
+        "with the real compile/deploy tools, choosing scope from the fleet reasoning above:\n"
+        "  - ISOLATED event on one node -> call 'compile_and_deploy_firmware' for that single node.\n"
+        "  - CORRELATED multi-node pattern (e.g. heat + gas + no motion) -> rewrite firmware for each "
+        "relevant node, then call 'push_firmware_to_multiple_nodes' with just those device_ids.\n"
+        "These real tools run arduino-cli and update the OTA manifest; they REPLACE the old simulated "
+        "'trigger_ota_flash'. Only fall back to 'trigger_ota_flash' if a real deploy tool is unavailable. "
+        "If a deploy tool returns an error string (arduino-cli not found / COMPILE FAILED / DEPLOY FAILED), "
+        "report it plainly — do not claim success.\n\n"
         "Always generate complete, compilable Arduino C++ code with detailed comments explaining your decisions."
     )
     
@@ -100,7 +109,10 @@ Follow these steps:
 4. Rewrite the *entire firmware* in C++/Arduino format to implement the policy, including
    a comment block naming any other nodes' signals that influenced the decision.
 5. Use 'write_new_firmware' to save the code.
-6. Use 'trigger_ota_flash' to simulate deployment.
+6. Deploy for real: 'compile_and_deploy_firmware' for a single isolated-event node, or
+   'push_firmware_to_multiple_nodes' with the relevant device_ids for a correlated
+   multi-node pattern. These run arduino-cli + update the OTA manifest and REPLACE the
+   simulated 'trigger_ota_flash'. If a deploy tool returns an error string, report it — don't claim success.
 """
         else:
             # Autonomous decision-making mode
@@ -134,7 +146,12 @@ Follow these steps:
 5. Rewrite the *entire firmware* with your intelligent modifications, including a comment
    block naming which other nodes' signals (if any) influenced the decision
 6. Use 'write_new_firmware' to save the optimized code with detailed comments explaining your decisions
-7. Use 'trigger_ota_flash' to deploy the update
+7. Deploy for real, choosing scope from your fleet reasoning:
+   - ISOLATED event on this node only -> 'compile_and_deploy_firmware' for the single device.
+   - CORRELATED multi-node pattern (e.g. heat + gas + no motion) -> rewrite firmware for each
+     relevant node with 'write_new_firmware', then 'push_firmware_to_multiple_nodes' with just those device_ids.
+   These run arduino-cli and update the OTA manifest, REPLACING the simulated 'trigger_ota_flash'.
+   If a deploy tool returns an error string (arduino-cli not found / COMPILE FAILED / DEPLOY FAILED), report it honestly.
 
 Make autonomous decisions that demonstrate your expertise in IoT firmware engineering.
 Include detailed comments in your code explaining why you made each decision.
