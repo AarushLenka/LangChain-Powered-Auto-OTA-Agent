@@ -4,6 +4,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import time
 from datetime import datetime
 
 import requests
@@ -68,6 +69,17 @@ def get_fleet_context_tool() -> str:
     node's latest sensor_type, value, event, and last_seen timestamp so you can
     decide whether the triggering event is isolated or correlated with other
     nodes' signals. Returns an empty object if no node has reported yet.
+
+    Each node is additionally annotated with:
+      - "age_seconds": how long ago that reading arrived (null if unknown)
+      - "stale": true if the reading is older than the staleness threshold
+        (Config.FLEET_STALENESS_SECONDS) or its timestamp is missing/unreadable.
+
+    A node with "stale": true is NOT current evidence. You MUST NOT treat a stale
+    reading as proof of a live correlated condition; base an ISOLATED vs CORRELATED
+    judgment on the fresh ("stale": false) readings only. If a stale node's signal
+    would have changed your decision, say so explicitly in the firmware comment
+    block instead of assuming the stale value still holds.
     """
     print("\nTOOL: Reading fleet context from all nodes...")
     try:
@@ -75,7 +87,21 @@ def get_fleet_context_tool() -> str:
             fleet = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         fleet = {}
-    return json.dumps(fleet, indent=2)
+
+    now = time.time()
+    annotated: dict[str, object] = {}
+    for device_id, state in fleet.items():
+        if not isinstance(state, dict):
+            annotated[device_id] = state
+            continue
+        last_seen = state.get("last_seen")
+        age = round(now - last_seen, 1) if isinstance(last_seen, (int, float)) else None
+        annotated[device_id] = {
+            **state,
+            "age_seconds": age,
+            "stale": age is None or age > Config.FLEET_STALENESS_SECONDS,
+        }
+    return json.dumps(annotated, indent=2)
 
 
 @tool
