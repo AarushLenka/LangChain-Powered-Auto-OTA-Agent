@@ -7,7 +7,10 @@ class Config:
     """Application configuration."""
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     DB_FILE = "db.json"
-    FIRMWARE_DIR = "firmware"
+    FIRMWARE_DIR = "firmware"            # generated .cpp source
+    FIRMWARE_STORE_DIR = "firmware_store"  # compiled .bin served for OTA
+    MANIFEST_FILE = "manifest.json"     # device_id -> latest version + bin path
+    FLEET_STATE_FILE = "fleet_state.json"  # device_id -> latest sensor reading
     SERVER_PORT = 5001
     DEBUG = True
     LLM_MODEL = "gpt-4o-mini"
