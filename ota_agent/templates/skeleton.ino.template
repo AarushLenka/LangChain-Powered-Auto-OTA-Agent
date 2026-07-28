@@ -1,0 +1,123 @@
+// =============================================================================
+//  ESP32 OTA SENSOR NODE  --  SHARED SKELETON  (NON-REGENERABLE)
+// =============================================================================
+//  THIS FILE IS THE FIXED PLUMBING FOR EVERY NODE IN THE FLEET.
+//
+//  !!!  DO NOT LET THE AGENT REGENERATE ANYTHING IN THIS FILE EXCEPT THE
+//  !!!  MARKED "AGENT SENSOR BLOCK" BELOW.
+//
+//  Everything outside the  ==== AGENT SENSOR BLOCK ====  markers is
+//  NON-REGENERABLE: the WiFi connect/reconnect logic and the OTA
+//  check/download loop are what allow this device to receive future
+//  updates over the air. If a generated firmware drops the OTA loop, the
+//  device can ONLY be recovered with a physical USB reflash. Treat the
+//  plumbing below as immutable.
+//
+//  The agent's ONLY job is to (re)write the body of readAndActOnSensor()
+//  between the START/END markers. It must not touch includes, constants,
+//  setup(), loop(), connectWiFi(), or checkForOTA().
+// =============================================================================
+
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <HTTPUpdate.h>
+// NOTE: nodes with a DHT sensor (node-climate) additionally #include <DHT.h>
+//       inside their AGENT SENSOR BLOCK region's include needs. Keep extra
+//       sensor-library includes grouped with the sensor block, not here.
+
+// ---- PER-NODE CONSTANTS (the ONLY things that differ between nodes) --------
+//  Exactly these four. Do not add more constants here; do not hardcode the
+//  server IP anywhere except BASE_URL.
+static const char*   BASE_URL         = "http://192.168.1.100:5001"; // OTA + report server
+static const char*   DEVICE_ID        = "node-REPLACE";              // e.g. "node-climate"
+static const char*   SENSOR_TYPE      = "REPLACE";                   // e.g. "temperature"
+static const char*   FIRMWARE_VERSION = "v1.0";                      // bumped on each OTA build
+// ---------------------------------------------------------------------------
+
+// WiFi credentials live here (per-deployment, not per-node firmware logic).
+static const char*   WIFI_SSID = "your-ssid";
+static const char*   WIFI_PASS = "your-pass";
+
+// How often to read the sensor / report / poll for OTA (ms).
+static const unsigned long LOOP_INTERVAL_MS = 10000;
+
+// ============================ NON-REGENERABLE ==============================
+// WiFi connect + reconnect. Blocks until connected on boot; loop() calls it
+// again to recover from drops.
+void connectWiFi() {
+  if (WiFi.status() == WL_CONNECTED) return;
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  unsigned long start = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - start < 20000) {
+    delay(500);
+  }
+}
+
+// Report one reading to the server. LOAD-BEARING CONTRACT: the server expects
+// QUERY PARAMETERS on POST /report/{DEVICE_ID}, NOT a JSON body. Sending JSON
+// here is a known regression -- keep sensor_type/value/event in the URL.
+void reportReading(float value, const char* event) {
+  if (WiFi.status() != WL_CONNECTED) return;
+  HTTPClient http;
+  String url = String(BASE_URL) + "/report/" + DEVICE_ID +
+               "?sensor_type=" + SENSOR_TYPE +
+               "&value=" + String(value, 2) +
+               "&event=" + (event ? String(event) : String(""));
+  http.begin(url);
+  http.POST("");            // empty body -- all data is in the query string
+  http.end();
+}
+
+// Poll GET /check/{DEVICE_ID}?current_version=FIRMWARE_VERSION and, if an
+// update is available, apply GET /download/{DEVICE_ID} via HTTPUpdate.
+// This is the loop that keeps the device field-updatable. DO NOT REMOVE.
+void checkForOTA() {
+  if (WiFi.status() != WL_CONNECTED) return;
+  HTTPClient http;
+  String checkUrl = String(BASE_URL) + "/check/" + DEVICE_ID +
+                    "?current_version=" + FIRMWARE_VERSION;
+  http.begin(checkUrl);
+  int code = http.GET();
+  String body = (code == 200) ? http.getString() : String("");
+  http.end();
+
+  if (code == 200 && body.indexOf("\"update_available\": true") >= 0) {
+    WiFiClient client;
+    String dlUrl = String(BASE_URL) + "/download/" + DEVICE_ID;
+    // HTTPUpdate reboots into the new firmware on success.
+    httpUpdate.update(client, dlUrl);
+  }
+}
+// ========================== END NON-REGENERABLE ============================
+
+
+// ==== AGENT SENSOR BLOCK START ====
+// The agent regenerates ONLY the body of this function. It reads the node's
+// sensor(s), computes a single float `value` for SENSOR_TYPE, decides whether
+// a threshold was crossed (set `event`, else leave ""), and reports both.
+//
+// The agent MUST prepend a comment here explaining which OTHER fleet nodes'
+// signals (if any) influenced this logic (per the Agent Behavior Contract).
+void readAndActOnSensor() {
+  // --- placeholder: replaced per-node by the agent ---
+  float value = 0.0f;
+  const char* event = "";
+  reportReading(value, event);
+}
+// ==== AGENT SENSOR BLOCK END ====
+
+
+// ============================ NON-REGENERABLE ==============================
+void setup() {
+  Serial.begin(115200);
+  connectWiFi();
+}
+
+void loop() {
+  connectWiFi();            // reconnect if dropped
+  checkForOTA();            // stay field-updatable FIRST, before sensor work
+  readAndActOnSensor();     // agent-owned logic reports the reading
+  delay(LOOP_INTERVAL_MS);
+}
+// ========================== END NON-REGENERABLE ============================
