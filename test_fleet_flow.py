@@ -17,7 +17,9 @@ node entry (e.g. staleness annotations) must not break this test.
 
 import json
 import os
+import shutil
 import sys
+import tempfile
 from unittest.mock import MagicMock
 
 # Config paths are relative, so state files land wherever cwd is. Pin it to the repo.
@@ -118,11 +120,50 @@ def check_json_body_rejected(client: TestClient) -> None:
     assert "node-climate" not in agent_fleet_view()
 
 
+def check_download_404s_when_no_firmware(client: TestClient) -> None:
+    """A 200 here would hand the ESP32 an error body to flash as a binary."""
+    r = client.get("/download/node-climate")
+    assert r.status_code == 404, (
+        f"GET /download with no firmware on record returned {r.status_code}, expected 404. "
+        "At 200 the ESP32 flashes the JSON error body as firmware."
+    )
+
+
+def check_check_stays_200_before_first_upload(client: TestClient) -> None:
+    """A USB-flashed node with nothing uploaded is a normal state, not an error."""
+    r = client.get("/check/node-climate", params={"current_version": "v1.0"})
+    assert r.status_code == 200, (
+        f"GET /check before any upload returned {r.status_code}, expected 200. "
+        "404ing this makes every freshly flashed node error-loop until its first deploy."
+    )
+    assert r.json()["update_available"] is False
+
+
+def check_update_flag_matches_client_parsing(client: TestClient) -> None:
+    """The shipped ESP32 templates must be able to find update_available in the real body.
+
+    The server emits compact JSON ("update_available":true). A client matching only
+    the pretty-printed form ("update_available": true) never sees an update and the
+    node silently never updates.
+    """
+    client.post("/upload/node-climate", params={"version": "v999"},
+                files={"file": ("f.bin", b"REALBIN")})
+    body = client.get("/check/node-climate", params={"current_version": "v1.0"}).text
+    matched = ('"update_available":true' in body) or ('"update_available": true' in body)
+    assert matched, f"no template-compatible update_available match in body: {body!r}"
+
+    d = client.get("/download/node-climate")
+    assert d.status_code == 200 and d.content == b"REALBIN"
+
+
 CHECKS = [
     check_empty_fleet_is_empty_object,
     check_query_param_report_round_trips,
     check_agent_view_agrees_with_fleet_endpoint,
     check_json_body_rejected,
+    check_download_404s_when_no_firmware,
+    check_check_stays_200_before_first_upload,
+    check_update_flag_matches_client_parsing,
 ]
 
 
@@ -133,13 +174,22 @@ def _clear_state() -> None:
 
 
 def run_check(check) -> None:
-    """Run one check against a clean slate, restoring any pre-existing runtime state."""
+    """Run one check against a clean slate, restoring any pre-existing runtime state.
+
+    Uploads are redirected into a temp dir so a check never writes a .bin into
+    the real firmware_store/.
+    """
     backups = {p: open(p, "rb").read() for p in STATE_FILES if os.path.exists(p)}
+    real_store = Config.FIRMWARE_STORE_DIR
+    tmp_store = tempfile.mkdtemp(prefix="test-firmware-store-")
     try:
         _clear_state()
+        Config.FIRMWARE_STORE_DIR = tmp_store
         with TestClient(create_app(MagicMock())) as client:
             check(client)
     finally:
+        Config.FIRMWARE_STORE_DIR = real_store
+        shutil.rmtree(tmp_store, ignore_errors=True)
         _clear_state()
         for path, data in backups.items():
             with open(path, "wb") as f:

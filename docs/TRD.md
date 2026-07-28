@@ -345,12 +345,12 @@ item.
 - **No firmware signing / integrity check.** `/download` serves whatever `.bin`
   the manifest points at; the node flashes it unverified. No rollback on a bad
   flash.
-- **Error-as-HTTP-200.** `/check` and `/download` return `200` with an error
-  object (e.g. `{"error": "no firmware found"}`) instead of a `4xx`. This is a
-  current simplification (see `API_SPEC.md` "Error Handling"); do not "fix" it
-  silently without checking whether the ESP32 `httpUpdate` client's error
-  handling depends on the present behavior. Normalizing it is a scoped
-  `ROADMAP.md` Phase 2 item that must update `API_SPEC.md` in the same change.
+- **Error status codes: normalized.** `/download` now returns `404` when no
+  firmware is on record, rather than `200` with an error body — a `200` there
+  would hand the ESP32 a JSON error to flash as a binary. `/check` deliberately
+  keeps `200 {"update_available": false}` for a device with nothing uploaded
+  yet, since that is a normal state for a freshly USB-flashed node rather than
+  an error. See `API_SPEC.md` "Error Handling Conventions".
 
 **Partial auth is worse than none.** Adding authentication to only a subset of
 endpoints creates a false sense of security. If/when auth lands, it must cover

@@ -94,7 +94,12 @@ def create_app(agent: FirmwareAgent) -> FastAPI:
 
     @app.get("/check/{device_id}")
     async def check_update(device_id: str, current_version: str):
-        """Report whether a newer firmware version exists for this node."""
+        """Report whether a newer firmware version exists for this node.
+
+        A node with no firmware uploaded yet is a normal steady state, not an
+        error: it still gets 200 with update_available false, so a node flashed
+        over USB can poll from boot without error-looping.
+        """
         manifest = _load_json(Config.MANIFEST_FILE)
         entry = manifest.get(device_id)
         if not entry:
@@ -104,12 +109,15 @@ def create_app(agent: FirmwareAgent) -> FastAPI:
 
     @app.get("/download/{device_id}")
     async def download_firmware(device_id: str):
-        """Return the current .bin for a device (called by httpUpdate on ESP32)."""
+        """Return the current .bin for a device (called by httpUpdate on ESP32).
+
+        404s when there is no firmware on record: a 200 here would hand the
+        ESP32 an error body to flash as if it were a binary.
+        """
         manifest = _load_json(Config.MANIFEST_FILE)
         entry = manifest.get(device_id)
         if not entry or not os.path.exists(entry["path"]):
-            # Known inconsistency (API_SPEC §/download): 200 with error body.
-            return JSONResponse({"error": "no firmware found"})
+            raise HTTPException(status_code=404, detail="no firmware found")
         return FileResponse(entry["path"], media_type="application/octet-stream")
 
     @app.post("/report/{device_id}")

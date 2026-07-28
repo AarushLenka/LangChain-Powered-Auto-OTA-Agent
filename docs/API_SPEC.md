@@ -75,6 +75,9 @@ If no firmware has ever been uploaded for this `device_id`:
 ```json
 { "update_available": false }
 ```
+This stays a `200`, not a 404 — a USB-flashed node with nothing uploaded yet is a normal steady state, and 404ing it would make every node error-loop until its first deploy.
+
+Note the response is compact JSON (`"update_available":true`, no space). ESP32 clients must not depend on a specific spacing when matching this field; the shipped templates accept either form.
 
 ---
 
@@ -82,11 +85,11 @@ If no firmware has ever been uploaded for this `device_id`:
 Returns the current `.bin` for a device. Called by `httpUpdate.update()` on the ESP32 after `/check` reports an update is available.
 
 **Response `200`:** binary, `Content-Type: application/octet-stream`
-**Response `200` (error case, no firmware on record):**
+**Response `404` (no firmware on record):**
 ```json
-{ "error": "no firmware found" }
+{ "detail": "no firmware found" }
 ```
-(Note: this error case currently returns HTTP 200 with an error body rather than a 4xx status — a known inconsistency; do not "fix" silently without checking whether the ESP32 `httpUpdate` client's error handling depends on the current behavior.)
+A 200 here would hand the ESP32 a JSON error body to flash as if it were a firmware binary, so this case is a hard 404. `httpUpdate.update()` treats the non-200 as a failed update and leaves the running firmware in place.
 
 ---
 
@@ -129,5 +132,6 @@ Human-readable HTML view, auto-refreshes every 5 seconds. Not intended for progr
 
 ## Error Handling Conventions (Current State)
 
-- Most error cases currently return `200` with an error object in the body rather than proper 4xx/5xx status codes (see `/check`, `/download`). This is a known simplification for the current phase, not an intended long-term contract — flag it in `ROADMAP.md` before changing behavior that other code depends on.
+- Error cases use real status codes. `/download` 404s when no firmware is on record; `/trigger-agent` 500s on agent or compile failure; missing/invalid query params yield FastAPI's `422`.
+- One deliberate exception: `/check` returns `200` with `update_available: false` for a device that has no firmware uploaded yet. That is a normal state for a freshly USB-flashed node, not an error.
 - No authentication headers are checked anywhere. Do not add auth to a subset of endpoints without a corresponding update here and in `TRD.md` §8 — partial auth coverage is worse than none because it creates a false sense of security.
