@@ -1,7 +1,7 @@
 {
   "metadata": {
     "description": "Comprehensive training dataset for autonomous IoT firmware agent",
-    "total_scenarios": 100,
+    "total_scenarios": 106,
     "categories": [
       "temperature_management",
       "power_management",
@@ -916,6 +916,60 @@
       "severity": "high",
       "expected_actions": ["full_autonomous_mode", "remote_monitoring_only", "extended_operation_plan"],
       "context": "Pandemic response"
+    },
+    {
+      "id": 101,
+      "category": "multi_sensor_coordination",
+      "device_id": "node-climate",
+      "event_details": "node-climate_temperature_critical_58C_while_node-air_gas_critical_MQ135_raw_3200_and_node-presence_no_motion_dark",
+      "severity": "critical",
+      "expected_actions": ["correlate_with_node-air_and_node-presence", "classify_as_unoccupied_thermal_gas_hazard", "generate_elevated_hazard_firmware", "push_firmware_to_multiple_nodes"],
+      "context": "CROSS-SENSOR CORRELATION (unoccupied hazard). Trigger is node-climate temperature critical, but node-air also reports critical gas and node-presence reports no motion. Agent MUST read fleet context, recognize heat+gas+no-motion as a correlated unoccupied-hazard pattern (not an isolated temperature spike), and perform a FLEET-WIDE elevated push to multiple nodes (node-climate, node-air, node-presence). Contrast with scenario 102, which has the SAME node-climate trigger but benign fleet context and must stay single-node."
+    },
+    {
+      "id": 102,
+      "category": "multi_sensor_coordination",
+      "device_id": "node-climate",
+      "event_details": "node-climate_temperature_critical_58C_while_node-air_gas_normal_MQ135_raw_400_and_node-presence_motion_present_lit",
+      "severity": "high",
+      "expected_actions": ["correlate_with_node-air_and_node-presence", "classify_as_isolated_temperature_event", "generate_low_urgency_single_node_firmware", "compile_and_deploy_firmware"],
+      "context": "ISOLATED (same trigger as 101, different fleet context). node-climate temperature is critical, but node-air gas is normal and node-presence shows motion (room occupied and no gas hazard). Agent MUST read fleet context, conclude the temperature event is isolated/uncorrelated, and issue a LOW-URGENCY SINGLE-NODE update to node-climate only via compile_and_deploy_firmware. No fleet-wide push. This is the core FR-8 contrast against scenario 101."
+    },
+    {
+      "id": 103,
+      "category": "multi_sensor_coordination",
+      "device_id": "node-air",
+      "event_details": "node-air_gas_spike_MQ135_raw_2900_while_node-presence_motion_present_occupants_in_room",
+      "severity": "critical",
+      "expected_actions": ["correlate_with_node-presence", "classify_as_occupied_gas_hazard_people_at_risk", "generate_urgent_ventilation_alert_firmware", "push_firmware_to_multiple_nodes"],
+      "context": "CROSS-SENSOR CORRELATION (occupied gas hazard). node-air reports a gas spike and node-presence reports motion, so occupants are present and at risk. Agent MUST correlate node-air with node-presence and push an URGENT ventilation/alert profile to MULTIPLE nodes (node-air + node-presence) because people are exposed — a more urgent response than the same gas spike in an empty room."
+    },
+    {
+      "id": 104,
+      "category": "multi_sensor_coordination",
+      "device_id": "node-structural",
+      "event_details": "node-structural_proximity_alert_HCSR04_distance_8cm_while_node-climate_node-air_node-presence_all_normal",
+      "severity": "medium",
+      "expected_actions": ["read_fleet_context", "classify_as_isolated_proximity_event", "generate_single_node_firmware", "compile_and_deploy_firmware"],
+      "context": "ISOLATED single-node. node-structural reports a proximity/distance alert while every other node (node-climate, node-air, node-presence) reads normal. No correlation exists, so the agent MUST keep this a SINGLE-NODE update to node-structural only and not escalate to a fleet-wide push."
+    },
+    {
+      "id": 105,
+      "category": "multi_sensor_coordination",
+      "device_id": "node-presence",
+      "event_details": "node-presence_motion_detected_in_darkness_LDR_low_while_node-climate_node-air_node-structural_all_normal",
+      "severity": "low",
+      "expected_actions": ["read_fleet_context", "classify_as_isolated_presence_lighting_event", "generate_single_node_lighting_adjustment_firmware", "compile_and_deploy_firmware"],
+      "context": "ISOLATED single-node. node-presence detects motion in a dark room (PIR active, LDR low) while all other nodes read normal. With no correlated anomaly elsewhere, the agent MUST treat this as a routine presence/lighting adjustment and issue a LOW-URGENCY SINGLE-NODE update to node-presence only."
+    },
+    {
+      "id": 106,
+      "category": "multi_sensor_coordination",
+      "device_id": "node-air",
+      "event_details": "node-air_gas_spike_MQ135_raw_2700_while_node-structural_proximity_alert_HCSR04_distance_10cm_and_node-presence_no_motion",
+      "severity": "high",
+      "expected_actions": ["correlate_with_node-structural_and_node-presence", "classify_as_correlated_containment_breach_no_occupants", "generate_elevated_multi_node_firmware", "push_firmware_to_multiple_nodes"],
+      "context": "CROSS-SENSOR CORRELATION (multi-node, no gas-vs-people conflict). node-air reports a gas spike AND node-structural reports a proximity alert (e.g. an opened enclosure/door) while node-presence shows no motion. Agent MUST correlate node-air with node-structural and node-presence, treat it as a correlated containment/leak event rather than an isolated gas reading, and push an elevated profile to MULTIPLE nodes (node-air + node-structural)."
     }
   ]
 }
