@@ -52,7 +52,12 @@ void checkForOTA() {
   int code = http.GET();
   String body = (code == 200) ? http.getString() : String("");
   http.end();
-  if (code == 200 && body.indexOf("\"update_available\": true") >= 0) {
+  // Whitespace-tolerant: the server emits compact JSON ("key":true) while a
+  // pretty-printer would emit ("key": true). Match either.
+  bool updateAvailable = code == 200 &&
+      (body.indexOf("\"update_available\":true") >= 0 ||
+       body.indexOf("\"update_available\": true") >= 0);
+  if (updateAvailable) {
     WiFiClient client;
     httpUpdate.update(client, String(BASE_URL) + "/download/" + DEVICE_ID);
   }
