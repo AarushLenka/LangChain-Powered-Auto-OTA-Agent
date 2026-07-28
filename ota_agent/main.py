@@ -2,69 +2,33 @@ import os
 import sys
 import uvicorn
 from .config import Config
-from .database import DeviceDatabase
 from .agent import FirmwareAgent
 from .app import create_app
 
 
+FLEET_NODES = ["node-climate", "node-air", "node-presence", "node-structural"]
+
+
 def initialize_firmware_structure():
-    """Initialize firmware directory and default firmware."""
-    device_id = "device-001"
-    os.makedirs(os.path.join(Config.FIRMWARE_DIR, device_id), exist_ok=True)
-    initial_firmware_path = os.path.join(Config.FIRMWARE_DIR, device_id, "v1.0.cpp")
-    
-    if not os.path.exists(initial_firmware_path):
-        initial_code = """// Firmware Version: 1.0
-// Description: Initial firmware that monitors sensors A, C, D based on device schema
-#include <Arduino.h>
+    """Backfill each fleet node's firmware dir + v1.0.cpp placeholder.
 
-// --- Pin Definitions (based on sensor_schema)
-#define SENSOR_A_PIN 1  // temperature
-#define SENSOR_C_PIN 3  // pressure  
-#define SENSOR_D_PIN 4  // light_intensity
-
-// --- Configuration ---
-const int SENSOR_A_THRESHOLD = 100;
-
-void setup() {
-    Serial.begin(115200);
-    while (!Serial);
-    Serial.println("============================");
-    Serial.println("Device starting... Firmware v1.0");
-    Serial.println("Mode: Monitoring Sensors A, C, D");
-    Serial.println("============================");
-    
-    pinMode(SENSOR_A_PIN, INPUT);
-    pinMode(SENSOR_C_PIN, INPUT);
-    pinMode(SENSOR_D_PIN, INPUT);
-}
-
-void loop() {
-    int sensor_a_value = analogRead(SENSOR_A_PIN);
-    int sensor_c_value = analogRead(SENSOR_C_PIN);
-    int sensor_d_value = analogRead(SENSOR_D_PIN);
-
-    Serial.print("DATA: Sensor A (temperature): ");
-    Serial.println(sensor_a_value);
-    Serial.print("DATA: Sensor C (pressure): ");
-    Serial.println(sensor_c_value);
-    Serial.print("DATA: Sensor D (light_intensity): ");
-    Serial.println(sensor_d_value);
-
-    if (sensor_a_value > SENSOR_A_THRESHOLD) {
-        Serial.println("EVENT: sensor_A_threshold_exceeded");
-    }
-
-    Serial.println("---");
-    delay(5000);
-}
-"""
-        with open(initial_firmware_path, 'w') as f:
-            f.write(initial_code)
-    
-    # Initialize device in database
-    db = DeviceDatabase(Config.DB_FILE)
-    db.initialize_device(device_id, initial_firmware_path)
+    db.json is the source of truth for the fleet roster (seeded ahead of time);
+    this only ensures the on-disk v1.0.cpp exists so read_current_firmware works
+    before the agent generates anything. Real WiFi/OTA plumbing lives in
+    ota_agent/templates/ and is applied when a node is first flashed.
+    """
+    for device_id in FLEET_NODES:
+        node_dir = os.path.join(Config.FIRMWARE_DIR, device_id)
+        os.makedirs(node_dir, exist_ok=True)
+        v1_path = os.path.join(node_dir, "v1.0.cpp")
+        if not os.path.exists(v1_path):
+            with open(v1_path, 'w') as f:
+                f.write(
+                    "// Firmware Version: 1.0 (placeholder)\n"
+                    f"// Device: {device_id}\n"
+                    "// Sensor-logic block is agent-generated; the WiFi/OTA\n"
+                    "// skeleton comes from ota_agent/templates/.\n"
+                )
 
 
 def main():
