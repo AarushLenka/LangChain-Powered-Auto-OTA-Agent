@@ -1,36 +1,69 @@
 {
   "node-climate": {
     "hardware": "DHT22",
-    "current_firmware_path": "firmware/node-climate/v1.0.cpp",
+    "current_firmware_path": "firmware/node-climate/v20260728120000.cpp",
     "sensor_schema": {
-      "temperature": {"type": "temperature", "pin": 4, "unit": "celsius"},
-      "humidity": {"type": "humidity", "pin": 4, "unit": "percentage"}
+      "temperature": {
+        "type": "temperature",
+        "pin": 4,
+        "unit": "celsius"
+      },
+      "humidity": {
+        "type": "humidity",
+        "pin": 4,
+        "unit": "percentage"
+      }
     },
-    "version_history": ["firmware/node-climate/v1.0.cpp"]
+    "version_history": [
+      "firmware/node-climate/v1.0.cpp",
+      "firmware/node-climate/v20260728120000.cpp"
+    ]
   },
   "node-air": {
     "hardware": "MQ-135",
     "current_firmware_path": "firmware/node-air/v1.0.cpp",
     "sensor_schema": {
-      "air_quality": {"type": "air_quality", "pin": 34, "unit": "raw_analog"}
+      "air_quality": {
+        "type": "air_quality",
+        "pin": 34,
+        "unit": "raw_analog"
+      }
     },
-    "version_history": ["firmware/node-air/v1.0.cpp"]
+    "version_history": [
+      "firmware/node-air/v1.0.cpp"
+    ]
   },
   "node-presence": {
     "hardware": "PIR + LDR",
     "current_firmware_path": "firmware/node-presence/v1.0.cpp",
     "sensor_schema": {
-      "motion": {"type": "motion", "pin": 27, "unit": "boolean"},
-      "light": {"type": "light", "pin": 35, "unit": "raw_analog"}
+      "motion": {
+        "type": "motion",
+        "pin": 27,
+        "unit": "boolean"
+      },
+      "light": {
+        "type": "light",
+        "pin": 35,
+        "unit": "raw_analog"
+      }
     },
-    "version_history": ["firmware/node-presence/v1.0.cpp"]
+    "version_history": [
+      "firmware/node-presence/v1.0.cpp"
+    ]
   },
   "node-structural": {
     "hardware": "HC-SR04",
     "current_firmware_path": "firmware/node-structural/v1.0.cpp",
     "sensor_schema": {
-      "distance": {"type": "distance", "pin": 5, "unit": "centimeter"}
+      "distance": {
+        "type": "distance",
+        "pin": 5,
+        "unit": "centimeter"
+      }
     },
-    "version_history": ["firmware/node-structural/v1.0.cpp"]
+    "version_history": [
+      "firmware/node-structural/v1.0.cpp"
+    ]
   }
 }

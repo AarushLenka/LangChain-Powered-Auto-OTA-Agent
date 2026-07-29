@@ -179,12 +179,26 @@ def compile_and_deploy_firmware(device_id: str) -> str:
         if result.returncode != 0:
             return f"COMPILE FAILED: {(result.stderr or result.stdout).strip()}"
 
-        bins = glob.glob(os.path.join(build_dir, "*.bin"))
-        # Prefer the main application binary over bootloader/partition bins.
-        app_bins = [b for b in bins if "bootloader" not in b and "partition" not in b]
-        bin_path = (app_bins or bins or [None])[0]
-        if not bin_path:
-            return f"COMPILE FAILED: no .bin produced in {build_dir}."
+        # arduino-cli emits several .bin files; httpUpdate wants the application
+        # image only. Name it exactly rather than filtering by exclusion:
+        #   <sketch>.ino.bin            app image      (what OTA needs)
+        #   <sketch>.ino.merged.bin     4MB full-flash image, starts 0xFF
+        #   <sketch>.ino.bootloader.bin bootloader
+        #   <sketch>.ino.partitions.bin partition table
+        # Uploading merged.bin would hand the node a full-flash image to apply
+        # as an app update.
+        bin_path = os.path.join(build_dir, f"{version}.ino.bin")
+        if not os.path.exists(bin_path):
+            produced = [os.path.basename(b) for b in glob.glob(os.path.join(build_dir, "*.bin"))]
+            return (f"COMPILE FAILED: expected app image {version}.ino.bin in {build_dir}; "
+                    f"got {produced}.")
+
+        # An ESP32 app image starts with the 0xE9 magic byte. Refuse anything else
+        # rather than serving a node an image it cannot boot.
+        with open(bin_path, "rb") as fh:
+            if fh.read(1) != b"\xe9":
+                return (f"COMPILE FAILED: {os.path.basename(bin_path)} is not a valid ESP32 "
+                        "app image (missing 0xE9 magic byte).")
 
         try:
             with open(bin_path, "rb") as fh:
