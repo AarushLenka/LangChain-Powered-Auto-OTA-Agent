@@ -8,23 +8,22 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
+#include "secrets.h"             // WiFi SSID, password, OTA server IP (NOT in git)
 
 // ---- PER-NODE CONSTANTS (exactly four) ------------------------------------
-static const char*   BASE_URL         = "http://192.168.1.100:5001";
+static const char*   BASE_URL         = OTA_BASE_URL;
 static const char*   DEVICE_ID        = "node-structural";
 static const char*   SENSOR_TYPE      = "distance";
 static const char*   FIRMWARE_VERSION = "v1.0";
 // ---------------------------------------------------------------------------
 
-static const char*   WIFI_SSID = "your-ssid";
-static const char*   WIFI_PASS = "your-pass";
 static const unsigned long LOOP_INTERVAL_MS = 10000;
 
 // ============================ NON-REGENERABLE ==============================
 void connectWiFi() {
   if (WiFi.status() == WL_CONNECTED) return;
   WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   unsigned long start = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - start < 20000) {
     delay(500);
