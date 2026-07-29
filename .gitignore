@@ -42,9 +42,11 @@ dist/
 # ========================================
 # NEVER commit secret keys, passwords, or credentials!
 .env
+.env.local
 *.key
 *.pem
 *.secret
+secrets.h
 # Add any specific secret files by name below
 # secrets.json
 # *credentials.json
@@ -111,6 +113,12 @@ firmware_store/
 
 # Generated knowledge-graph output
 graphify-out/
+
+# 7. Build artifacts & docs
+# ========================================
+docs/Invention_Disclosure_Format_B.docx
+docs/_build_idf.py
+docs/_build/
 
 # 7. JSON
 # ========================================
