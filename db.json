@@ -1,48 +1,71 @@
 {
-  "device-001": {
-    "current_firmware_path": "firmware/device-001/v20251113141430.cpp",
+  "node-climate": {
+    "hardware": "DHT22",
+    "current_firmware_path": "firmware/node-climate/v20260728120000.cpp",
     "sensor_schema": {
-      "A": {
+      "temperature": {
         "type": "temperature",
-        "pin": 1,
+        "pin": 4,
         "unit": "celsius"
       },
-      "B": {
+      "humidity": {
         "type": "humidity",
-        "pin": 2,
-        "unit": "percentage"
-      },
-      "C": {
-        "type": "pressure",
-        "pin": 3,
-        "unit": "pascal"
-      },
-      "D": {
-        "type": "light_intensity",
         "pin": 4,
-        "unit": "lux"
-      },
-      "E": {
-        "type": "motion",
-        "pin": 5,
-        "unit": "boolean"
-      },
-      "F": {
-        "type": "gps_latitude",
-        "pin": 6,
-        "unit": "degrees"
+        "unit": "percentage"
       }
     },
     "version_history": [
-      "firmware/device-001/v1.0.cpp",
-      "firmware/device-001/v20251104221103.cpp",
-      "firmware/device-001/v20251106222022.cpp",
-      "firmware/device-001/v20251106234228.cpp",
-      "firmware/device-001/v20251113110544.cpp",
-      "firmware/device-001/v20251113140847.cpp",
-      "firmware/device-001/v20251113141016.cpp",
-      "firmware/device-001/v20251113141158.cpp",
-      "firmware/device-001/v20251113141430.cpp"
+      "firmware/node-climate/v1.0.cpp",
+      "firmware/node-climate/v20260728120000.cpp"
+    ]
+  },
+  "node-air": {
+    "hardware": "MQ-135",
+    "current_firmware_path": "firmware/node-air/v20260801170050.cpp",
+    "sensor_schema": {
+      "air_quality": {
+        "type": "air_quality",
+        "pin": 34,
+        "unit": "raw_analog"
+      }
+    },
+    "version_history": [
+      "firmware/node-air/v1.0.cpp",
+      "firmware/node-air/v20260801170050.cpp"
+    ]
+  },
+  "node-presence": {
+    "hardware": "PIR + LDR",
+    "current_firmware_path": "firmware/node-presence/v20260801170050.cpp",
+    "sensor_schema": {
+      "motion": {
+        "type": "motion",
+        "pin": 27,
+        "unit": "boolean"
+      },
+      "light": {
+        "type": "light",
+        "pin": 35,
+        "unit": "raw_analog"
+      }
+    },
+    "version_history": [
+      "firmware/node-presence/v1.0.cpp",
+      "firmware/node-presence/v20260801170050.cpp"
+    ]
+  },
+  "node-structural": {
+    "hardware": "HC-SR04",
+    "current_firmware_path": "firmware/node-structural/v1.0.cpp",
+    "sensor_schema": {
+      "distance": {
+        "type": "distance",
+        "pin": 5,
+        "unit": "centimeter"
+      }
+    },
+    "version_history": [
+      "firmware/node-structural/v1.0.cpp"
     ]
   }
 }
