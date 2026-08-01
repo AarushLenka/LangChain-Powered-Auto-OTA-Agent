@@ -21,7 +21,7 @@
   },
   "node-air": {
     "hardware": "MQ-135",
-    "current_firmware_path": "firmware/node-air/v1.0.cpp",
+    "current_firmware_path": "firmware/node-air/v20260801170050.cpp",
     "sensor_schema": {
       "air_quality": {
         "type": "air_quality",
@@ -30,12 +30,13 @@
       }
     },
     "version_history": [
-      "firmware/node-air/v1.0.cpp"
+      "firmware/node-air/v1.0.cpp",
+      "firmware/node-air/v20260801170050.cpp"
     ]
   },
   "node-presence": {
     "hardware": "PIR + LDR",
-    "current_firmware_path": "firmware/node-presence/v1.0.cpp",
+    "current_firmware_path": "firmware/node-presence/v20260801170050.cpp",
     "sensor_schema": {
       "motion": {
         "type": "motion",
@@ -49,7 +50,8 @@
       }
     },
     "version_history": [
-      "firmware/node-presence/v1.0.cpp"
+      "firmware/node-presence/v1.0.cpp",
+      "firmware/node-presence/v20260801170050.cpp"
     ]
   },
   "node-structural": {
